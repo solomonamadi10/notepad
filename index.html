@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solomon Amadi Notepad</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8, #c1d5e0);
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+        #initial-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        #initial-screen .image-container {
+            width: 384px;
+            max-height: 384px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        #initial-screen .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 10px;
+        }
+        #initial-screen button {
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            min-width: 200px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+        #initial-screen button:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: scale(1.05);
+        }
+        #pin-screen, #login-details, #reset-confirm, #diary-pin-screen {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        #pin-screen input, #diary-pin-screen input, #profile-container input, #profile-container select {
+            margin: 10px 0;
+            padding: 12px;
+            font-size: 1.1rem;
+            width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+        }
+        #pin-screen button, #diary-pin-screen button {
+            margin: 8px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: 8px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #pin-screen button:hover, #diary-pin-screen button:hover {
+            background-color: #357bd9;
+        }
+        .sidebar {
+            width: 250px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            height: 100%;
+            font-size: 1.1rem;
+            display: none;
+        }
+        .tab {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            cursor: pointer;
+            background: #f0f4f8;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .tab:hover {
+            background: #e0e6ec;
+            transform: translateX(5px);
+        }
+        .tab.active {
+            background: #4a90e2;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .tab-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            width: 25px;
+            text-align: center;
+        }
+        .jotter {
+            flex: 1;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            height: 100%;
+            overflow-y: auto;
+            display: none;
+        }
+        .page {
+            padding: 25px;
+            border: 1px solid #ddd;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background: white;
+            min-height: 95%;
+            position: relative;
+            color: #333;
+        }
+        #textArea {
+            width: 100%;
+            min-height: 300px;
+            resize: vertical;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            line-height: 1.6em;
+            font-size: 1rem;
+            background: #f8f8f8;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        .controls button, .controls input {
+            margin: 5px;
+            padding: 12px;
+            font-size: 1rem;
+            border-radius: 8px;
+        }
+        .save-list, .events-list, .task-list, .appointment-list {
+            margin-top: 20px;
+            max-height: 25vh;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+        .list-item {
+            padding: 12px;
+            background: #e6f3ff;
+            margin: 8px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .list-item:hover {
+            background: #d4ecff;
+        }
+        .list-item button {
+            background: transparent;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .list-item button:hover {
+            color: #ff4d4d;
+        }
+        .sticky-note {
+            position: absolute;
+            width: 250px;
+            min-height: 180px;
+            background: #ffff99;
+            border: 1px solid #ccc;
+            padding: 15px;
+            resize: both;
+            overflow: auto;
+            z-index: 5;
+            cursor: move;
+            font-size: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            transition: box-shadow 0.3s;
+        }
+        .sticky-note:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .sticky-note button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            padding: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        .tab-content {
+            display: none;
+            width: 100%;
+        }
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+        .about-content ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+        #handwritingCanvas {
+            border: 1px solid #000;
+            cursor: crosshair;
+            border-radius: 8px;
+            touch-action: none; /* Prevent scrolling on touch */
+        }
+        .audio-controls button {
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin: 0 10px;
+            padding: 10px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+        .audio-controls button:hover {
+            background-color: #e0e0e0;
+        }
+        #diary-profile-pic {
+            width: 2in;
+            height: 2in;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #4a90e2;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .diary-section {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: calc(100vh - 120px);
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #f8f8f8;
+        }
+        #diaryContent .page {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        #diaryContent .page h2 {
+            margin-bottom: 10px;
+        }
+        #diaryContent .flex-container {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            overflow: auto;
+        }
+        #diaryContent .sub-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        #diaryContent textarea, #diaryContent .list-container, #diaryContent .file-list {
+            flex: 1;
+            width: 100%;
+        }
+        .file-list {
+            margin-top: 10px;
+            list-style: none;
+            padding: 0;
+        }
+        .file-list li {
+            background: #e6f3ff;
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .file-list button {
+            background: none;
+            border: none;
+            color: #ff4d4d;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                padding: 10px;
+            }
+            .tab span:not(.tab-icon) {
+                display: none;
+            }
+            .tab {
+                justify-content: center;
+                padding: 10px;
+            }
+            .tab-icon {
+                margin: 0;
+            }
+            .jotter {
+                padding: 15px;
+            }
+            .page {
+                padding: 15px;
+            }
+            .controls {
+                flex-direction: column;
+            }
+            .controls button, .controls input {
+                width: 100%;
+                margin-top: 10px;
+            }
+            #diary-profile-pic {
+                width: 2in;
+                height: 2in;
+            }
+            #diaryContent .flex-container {
+                flex-direction: column;
+            }
+            .diary-section {
+                height: auto;
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="initial-screen">
+        <div class="image-container">
+            <img src="solomonamadiltdnotepad.png" alt="Solomon Amadi Ltd Notepad">
+        </div>
+        <button onclick="handleOption('login')" data-english="Login" data-spanish="Iniciar Sesión">Login</button>
+        <button onclick="handleOption('reset')" data-english="Reset" data-spanish="Restablecer">Reset</button>
+    </div>
+    <div id="pin-screen">
+        <h3 id="pin-title" class="text-xl font-bold mb-4" data-english="Set Name and PIN" data-spanish="Establecer Nombre y PIN">Set Name and PIN</h3>
+        <div id="profile-container">
+            <h4 class="text-lg font-semibold mt-4 mb-2" data-english="My Profile" data-spanish="Mi Perfil">My Profile</h4>
+            <input type="text" id="user-name" data-english-placeholder="Enter your name" data-spanish-placeholder="Introduce tu nombre" placeholder="Enter your name" required>
+            <label data-english="Sex:" data-spanish="Sexo:">Sex:</label>
+            <select id="profileSex" class="w-full p-2 border rounded">
+                <option value="male" data-english="Male" data-spanish="Hombre">Male</option>
+                <option value="female" data-english="Female" data-spanish="Mujer">Female</option>
+                <option value="other" data-english="Other" data-spanish="Otro">Otro</option>
+            </select>
+            <label data-english="Date of Birth:" data-spanish="Fecha de Nacimiento:">Date of Birth:</label>
+            <input type="date" id="profileDob" class="w-full p-2 border rounded">
+            <label data-english="Country:" data-spanish="País:">Country:</label>
+            <input type="text" id="profileCountry" data-english-placeholder="Country" data-spanish-placeholder="País" placeholder="Country" class="w-full p-2 border rounded">
+            <label data-english="Phone Number:" data-spanish="Número de Teléfono:">Phone Number:</label>
+            <input type="tel" id="profilePhone" data-english-placeholder="Phone Number" data-spanish-placeholder="Número de Teléfono" placeholder="Phone Number" class="w-full p-2 border rounded">
+            <label data-english="Profile Picture:" data-spanish="Foto de Perfil:">Profile Picture:</label>
+            <input type="file" id="profilePic" accept="image/*" class="w-full p-2 border rounded">
+            <button onclick="saveProfileOnly()" class="px-4 py-2 bg-green-500 text-white rounded mt-2" data-english="Save Profile" data-spanish="Guardar Perfil">Save Profile</button>
+        </div>
+        <h4 class="text-lg font-semibold mt-4 mb-2" data-english="Notepad Security" data-spanish="Seguridad del Bloc de Notas">Notepad Security</h4>
+        <input type="text" id="notepadPin" maxlength="4" data-english-placeholder="Enter 4-digit PIN (numbers only)" data-spanish-placeholder="Introduce PIN de 4 dígitos (solo números)" placeholder="Enter 4-digit PIN (numbers only)" pattern="\d{4}" required>
+        <input type="text" id="notepadPinConfirm" maxlength="4" data-english-placeholder="Confirm PIN" data-spanish-placeholder="Confirmar PIN" placeholder="Confirm PIN" pattern="\d{4}" required>
+        <h4 class="text-lg font-semibold mt-4 mb-2" data-english="Diary Security" data-spanish="Seguridad del Diario">Diary Security</h4>
+        <input type="password" id="diaryPassword" maxlength="8" data-english-placeholder="Enter Diary password (8 characters max)" data-spanish-placeholder="Introduce contraseña del Diario (8 caracteres máx.)" placeholder="Enter Diary password (8 characters max)" required>
+        <input type="password" id="diaryPasswordConfirm" maxlength="8" data-english-placeholder="Confirm password" data-spanish-placeholder="Confirmar contraseña" placeholder="Confirm password" required>
+        <select id="security-question" required class="w-full p-3 my-2 border rounded">
+            <option value="" data-english="Select Security Question" data-spanish="Seleccionar Pregunta de Seguridad">Select Security Question</option>
+            <option value="mother" data-english="What is your mother's maiden name?" data-spanish="¿Cuál es el apellido de soltera de tu madre?">What is your mother's maiden name?</option>
+            <option value="school" data-english="Where was your first elementary school?" data-spanish="¿Dónde estuvo tu primera escuela primaria?">Where was your first elementary school?</option>
+            <option value="friend" data-english="What is the name of your best friend?" data-spanish="¿Cuál es el nombre de tu mejor amigo(a)?">What is the name of your best friend?</option>
+        </select>
+        <input type="text" id="security-answer" data-english-placeholder="Enter answer" data-spanish-placeholder="Introduce respuesta" placeholder="Enter answer" required>
+        <button id="set" onclick="setPinsAndProfile()" data-english="Set" data-spanish="Establecer">Set</button>
+        <button onclick="cancelPin()" data-english="Cancel" data-spanish="Cancelar">Cancel</button>
+        <p id="pin-message" class="text-red-500 mt-2"></p>
+        <input type="number" id="enter-pin" maxlength="4" data-english-placeholder="Enter PIN to access" data-spanish-placeholder="Introduce PIN para acceder" placeholder="Enter PIN to access" style="display:none;">
+        <button id="verify-pin" style="display:none;" onclick="verifyPin()" data-english="Verify" data-spanish="Verificar">Verify</button>
+    </div>
+    <div id="diary-pin-screen">
+        <h3 class="text-xl font-bold mb-4" data-english="Enter Diary Password" data-spanish="Introduce Contraseña del Diario">Enter Diary Password</h3>
+        <input type="password" id="diary-enter-pin" maxlength="8" data-english-placeholder="Enter Diary Password" data-spanish-placeholder="Introduce Contraseña del Diario" placeholder="Enter Diary Password" required>
+        <button onclick="verifyDiaryPin()" data-english="Verify" data-spanish="Verificar">Verify</button>
+        <button onclick="cancelDiaryPin()" data-english="Cancel" data-spanish="Cancelar">Cancel</button>
+        <p id="diary-pin-message" class="text-red-500 mt-2"></p>
+    </div>
+    <div id="reset-confirm">
+        <h3 class="text-xl font-bold mb-4" data-english="Confirm Reset" data-spanish="Confirmar Restablecimiento">Confirm Reset</h3>
+        <p data-english="Security Question:" data-spanish="Pregunta de Seguridad:">Security Question: <span id="reset-question"></span></p>
+        <input type="text" id="reset-answer" data-english-placeholder="Enter answer" data-spanish-placeholder="Introduce respuesta" placeholder="Enter answer" required class="w-full p-3 my-2 border rounded">
+        <p data-english="Are you sure you want to reset PIN, password, username, and all saved data?" data-spanish="¿Estás seguro de que quieres restablecer el PIN, la contraseña, el nombre de usuario y todos los datos guardados?">Are you sure you want to reset PIN, password, username, and all saved data?</p>
+        <button id="reset-confirm-btn" onclick="confirmReset()" data-english="Yes" data-spanish="Sí">Yes</button>
+        <button onclick="closeReset()" data-english="No" data-spanish="No">No</button>
+        <p id="reset-message" class="text-red-500 mt-2"></p>
+    </div>
+    <div id="login-details">
+        <h3 class="text-xl font-bold mb-4" data-english="Login History" data-spanish="Historial de Inicio de Sesión">Login History</h3>
+        <p data-english="Registered Name:" data-spanish="Nombre Registrado:">Registered Name: <span id="registered-name"></span></p>
+        <p class="text-sm text-gray-500 italic mb-4" data-english="PIN protected. You will be prompted for your PIN to view this history." data-spanish="Protegido por PIN. Se te pedirá tu PIN para ver este historial.">PIN protected. You will be prompted for your PIN to view this history.</p>
+        <ul id="login-history" class="list-disc pl-5"></ul>
+        <button onclick="deleteLoginHistory()" data-english="Delete History" data-spanish="Borrar Historial">Delete History</button>
+        <button onclick="closeLoginDetails()" data-english="Close" data-spanish="Cerrar">Close</button>
+    </div>
+    <div class="sidebar">
+        <div class="tab active" onclick="showTab('text')"><span class="tab-icon">📝</span><span class="tab-text" data-english="Text" data-spanish="Texto">Text</span></div>
+        <div class="tab" onclick="showTab('secure')"><span class="tab-icon">🔒</span><span class="tab-text" data-english="Secure" data-spanish="Seguro">Secure</span></div>
+        <div class="tab" onclick="showTab('loginDetails')"><span class="tab-icon">👤</span><span class="tab-text" data-english="Login Details" data-spanish="Detalles de inicio de sesión">Login Details</span></div>
+        <div class="tab" onclick="showTab('stickyNotes')"><span class="tab-icon">📌</span><span class="tab-text" data-english="Sticky Notes" data-spanish="Notas adhesivas">Sticky Notes</span></div>
+        <div class="tab" onclick="showTab('page3')"><span class="tab-icon">✍️</span><span class="tab-text" data-english="Handwriting Pad" data-spanish="Bloc de escritura">Handwriting Pad</span></div>
+        <div class="tab" onclick="showTab('page3audio')"><span class="tab-icon">🎤</span><span class="tab-text" data-english="Audio Notes" data-spanish="Notas de audio">Audio Notes</span></div>
+        <div class="tab" onclick="showTab('event')"><span class="tab-icon">🗓️</span><span class="tab-text" data-english="Events" data-spanish="Eventos">Events</span></div>
+        <div class="tab" onclick="showTab('task')"><span class="tab-icon">✔️</span><span class="tab-text" data-english="Tasks" data-spanish="Tareas">Tasks</span></div>
+        <div class="tab" onclick="showTab('appointment')"><span class="tab-icon">🤝</span><span class="tab-text" data-english="Appointments" data-spanish="Citas">Appointments</span></div>
+        <div class="tab" onclick="showTab('search')"><span class="tab-icon">🔍</span><span class="tab-text" data-english="Search" data-spanish="Buscar">Search</span></div>
+        <div class="tab" onclick="showTab('diary')"><span class="tab-icon">📖</span><span class="tab-text" data-english="Diary" data-spanish="Diario">Diario</span></div>
+        <div class="tab" onclick="showTab('about')"><span class="tab-icon">ℹ️</span><span class="tab-text" data-english="About" data-spanish="Acerca de">About</span></div>
+        <div class="tab" onclick="showTab('instructions')"><span class="tab-icon">📚</span><span class="tab-text" data-english="Instructions" data-spanish="Instrucciones">Instrucciones</span></div>
+    </div>
+    <div class="jotter" id="notepad">
+        <div class="page" id="page1">
+            <div id="textContent" class="tab-content active">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="Text Notes" data-spanish="Notas de Texto">Text Notes</h2>
+                <textarea id="textArea" class="mt-2" data-english-placeholder="Start typing..." data-spanish-placeholder="Empieza a escribir..." placeholder="Start typing..."></textarea>
+                <div class="controls flex flex-wrap gap-4">
+                    <button onclick="speakText()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" data-english="Text to Speech" data-spanish="Texto a Voz">Text to Speech</button>
+                    <input type="text" id="search" class="p-2 border rounded flex-1" data-english-placeholder="Search text..." data-spanish-placeholder="Buscar texto..." placeholder="Search text...">
+                    <button onclick="searchText()" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700" data-english="Search" data-spanish="Buscar">Search</button>
+                    <button onclick="saveText()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700" data-english="Save Text" data-spanish="Guardar Texto">Save Text</button>
+                    <button onclick="exportFile('pdf')" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600" data-english="Export to PDF" data-spanish="Exportar a PDF">Exportar a PDF</button>
+                    <button onclick="exportFile('txt')" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600" data-english="Export to TXT" data-spanish="Exportar a TXT">Exportar a TXT</button>
+                    <input type="datetime-local" id="reminder" class="p-2 border rounded">
+                    <button onclick="setReminder()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700" data-english="Set Reminder" data-spanish="Establecer Recordatorio">Set Reminder</button>
+                </div>
+                <div class="save-list" id="saveList"></div>
+            </div>
+            <div id="secureContent" class="tab-content">
+                <div class="page">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="Security Settings" data-spanish="Configuración de Seguridad">Security Settings</h2>
+
+                    <!-- Language Selection -->
+                    <h4 class="text-lg font-semibold mt-4 mb-2" data-english="Language Settings" data-spanish="Configuración de Idioma">Language Settings</h4>
+                    <select id="language-selector" class="w-full p-3 my-2 border rounded" onchange="changeLanguage()">
+                        <option value="en" data-english="English" data-spanish="Inglés">English</option>
+                        <option value="es" data-english="Español" data-spanish="Español">Español</option>
+                    </select>
+                    <!-- End Language Selection -->
+
+                    <div id="profile-container-secure">
+                        <h4 class="text-lg font-semibold mt-4 mb-2" data-english="My Profile" data-spanish="Mi Perfil">My Profile</h4>
+                        <input type="text" id="user-name-secure" data-english-placeholder="Enter your name" data-spanish-placeholder="Introduce tu nombre" placeholder="Enter your name" required class="p-2 border rounded">
+                        <label data-english="Sex:" data-spanish="Sexo:">Sex:</label>
+                        <select id="profileSex-secure" class="w-full p-2 border rounded">
+                            <option value="male" data-english="Male" data-spanish="Hombre">Male</option>
+                            <option value="female" data-english="Female" data-spanish="Mujer">Female</option>
+                            <option value="other" data-english="Other" data-spanish="Otro">Otro</option>
+                        </select>
+                        <label data-english="Date of Birth:" data-spanish="Fecha de Nacimiento:">Date of Birth:</label>
+                        <input type="date" id="profileDob-secure" class="w-full p-2 border rounded">
+                        <label data-english="Country:" data-spanish="País:">Country:</label>
+                        <input type="text" id="profileCountry-secure" data-english-placeholder="Country" data-spanish-placeholder="País" placeholder="Country" class="w-full p-2 border rounded">
+                        <label data-english="Phone Number:" data-spanish="Número de Teléfono:">Phone Number:</label>
+                        <input type="tel" id="profilePhone-secure" data-english-placeholder="Phone Number" data-spanish-placeholder="Número de Teléfono" placeholder="Phone Number" class="w-full p-2 border rounded">
+                        <label data-english="Profile Picture:" data-spanish="Foto de Perfil:">Profile Picture:</label>
+                        <input type="file" id="profilePic-secure" accept="image/*" class="w-full p-2 border rounded">
+                        <button onclick="saveProfileOnly()" class="px-4 py-2 bg-green-500 text-white rounded mt-2 shadow-md hover:bg-green-600 transition duration-300" data-english="Save Profile" data-spanish="Guardar Perfil">Save Profile</button>
+                    </div>
+                    <h4 class="text-lg font-semibold mt-4 mb-2" data-english="Notepad Security" data-spanish="Seguridad del Bloc de Notas">Notepad Security</h4>
+                    <input type="text" id="notepadPinSecure" maxlength="4" data-english-placeholder="Enter 4-digit PIN (numbers only)" data-spanish-placeholder="Introduce PIN de 4 dígitos (solo números)" placeholder="Enter 4-digit PIN (numbers only)" pattern="\d{4}" required class="p-3 border-2 border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-300 transition duration-200 shadow-sm">
+                    <input type="text" id="notepadPinConfirmSecure" maxlength="4" data-english-placeholder="Confirm PIN" data-spanish-placeholder="Confirmar PIN" placeholder="Confirm PIN" pattern="\d{4}" required class="p-3 border-2 border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-300 transition duration-200 shadow-sm">
+                    <h4 class="text-lg font-semibold mt-4 mb-2" data-english="Diary Security" data-spanish="Seguridad del Diario">Diary Security</h4>
+                    <input type="password" id="diaryPasswordSecure" maxlength="8" data-english-placeholder="Enter Diary password (8 characters max)" data-spanish-placeholder="Introduce contraseña del Diario (8 caracteres máx.)" placeholder="Enter Diary password (8 characters max)" required class="p-3 border-2 border-purple-400 rounded-lg focus:ring-2 focus:ring-purple-300 transition duration-200 shadow-sm">
+                    <input type="password" id="diaryPasswordConfirmSecure" maxlength="8" data-english-placeholder="Confirm password" data-spanish-placeholder="Confirmar contraseña" placeholder="Confirm password" required class="p-3 border-2 border-purple-400 rounded-lg focus:ring-2 focus:ring-purple-300 transition duration-200 shadow-sm">
+                    <select id="security-question-secure" required class="w-full p-3 my-2 border rounded">
+                        <option value="" data-english="Select Security Question" data-spanish="Seleccionar Pregunta de Seguridad">Select Security Question</option>
+                        <option value="mother" data-english="What is your mother's maiden name?" data-spanish="¿Cuál es el apellido de soltera de tu madre?">What is your mother's maiden name?</option>
+                        <option value="school" data-english="Where was your first elementary school?" data-spanish="¿Dónde estuvo tu primera escuela primaria?">Where was your first elementary school?</option>
+                        <option value="friend" data-english="What is the name of your best friend?" data-spanish="¿Cuál es el nombre de tu mejor amigo(a)?">What is the name of your best friend?</option>
+                    </select>
+                    <input type="text" id="security-answer-secure" data-english-placeholder="Enter answer" data-spanish-placeholder="Introduce respuesta" placeholder="Enter answer" required class="p-2 border rounded">
+                    <button onclick="setPinsAndProfile()" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-300 text-lg font-semibold shadow-lg mt-4" data-english="Save Security Settings" data-spanish="Guardar Configuración de Seguridad">Save Security Settings</button>
+                    <p id="secure-message" class="text-red-500 mt-2"></p>
+                </div>
+            </div>
+            <div id="loginDetailsContent" class="tab-content">
+                <div class="page">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="Login History" data-spanish="Historial de Inicio de Sesión">Login History</h2>
+                    <p data-english="Registered Name:" data-spanish="Nombre Registrado:">Registered Name: <span id="registered-name-sidebar"></span></p>
+                    <ul id="login-history-sidebar" class="list-disc pl-5"></ul>
+                    <button onclick="deleteLoginHistory()" data-english="Delete History" data-spanish="Borrar Historial">Borrar Historial</button>
+                </div>
+            </div>
+            <div id="stickyNotesContent" class="tab-content">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="Sticky Notes" data-spanish="Notas Adhesivas">Notas Adhesivas</h2>
+                <p class="italic text-gray-600 mb-4" data-english="Psst... Sticky notes can be a bit rebellious and may try to wander off when you change their position. Don't worry, just give them a nudge, and they'll get back in line! 😉" data-spanish="Psst... ¡Las notas adhesivas pueden ser un poco rebeldes y tratar de irse cuando cambias su posición. ¡No te preocupes, solo dales un empujón y volverán a la fila! 😉">Psst... Sticky notes can be a bit rebellious and may try to wander off when you change their position. Don't worry, just give them a nudge, and they'll get back in line! 😉</p>
+                <button onclick="addStickyNote()" class="mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700" data-english="Add Sticky Note" data-spanish="Añadir Nota Adhesiva">Añadir Nota Adhesiva</button>
+                <div id="stickyNotes" class="relative w-full h-full min-h-screen"></div>
+            </div>
+            <div id="page3Content" class="tab-content">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="Handwriting Pad" data-spanish="Bloc de Escritura">Bloc de Escritura</h2>
+                <div class="controls mt-4 mb-4 flex flex-wrap gap-2 items-center">
+                    <label for="penColor" class="font-medium" data-english="Pen Color:" data-spanish="Color del Lápiz:">Color del Lápiz:</label>
+                    <input type="color" id="penColor" value="#000000" class="w-10 h-10 border rounded-md cursor-pointer">
+                    
+                    <label for="penSize" class="font-medium ml-4" data-english="Size:" data-spanish="Tamaño:">Tamaño:</label>
+                    <input type="range" id="penSize" min="1" max="20" value="2" class="w-24 cursor-pointer">
+                    <span id="penSizeValue" class="text-gray-700 text-sm">2</span>
+                    
+                    <button onclick="setTool('pen')" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 ml-4" data-english="Pen" data-spanish="Lápiz">Lápiz</button>
+                    <button onclick="setTool('eraser')" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600" data-english="Eraser" data-spanish="Borrador">Borrador</button>
+                    <button onclick="clearCanvas()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600" data-english="Clear" data-spanish="Limpiar">Limpiar</button>
+                    <button onclick="exportCanvas('jpg')" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" data-english="Export JPG" data-spanish="Exportar JPG">Exportar JPG</button>
+                    <button onclick="exportCanvas('png')" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" data-english="Export PNG" data-spanish="Exportar PNG">Exportar PNG</button>
+                </div>
+                <canvas id="handwritingCanvas" width="800" height="400" class="shadow-md bg-white"></canvas>
+            </div>
+            <div id="page3audioContent" class="tab-content">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="Audio Notes" data-spanish="Notas de Audio">Notas de Audio</h2>
+                <div class="audio-controls flex justify-center mb-4">
+                    <button id="recordBtn" onclick="startRecording()" data-english="🔴 Record" data-spanish="🔴 Grabar">🔴 Grabar</button>
+                    <button id="pauseBtn" onclick="pauseRecording()" disabled data-english="⏸️ Pause" data-spanish="⏸️ Pausar">⏸️ Pausar</button>
+                    <button id="stopBtn" onclick="stopRecording()" disabled data-english="⏹️ Stop" data-spanish="⏹️ Detener">⏹️ Detener</button>
+                </div>
+                <textarea id="audioDescription" class="mt-2 p-2 w-full border rounded" data-english-placeholder="Describe the audio here..." data-spanish-placeholder="Describe el audio aquí..." placeholder="Describe el audio aquí..."></textarea>
+                <ul id="audioList" class="mt-4 space-y-2"></ul>
+            </div>
+            <div id="eventContent" class="tab-content">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="Event Scheduler" data-spanish="Programador de Eventos">Programador de Eventos</h2>
+                <div class="flex flex-col space-y-2">
+                    <label data-english="Date & Time:" data-spanish="Fecha y Hora:">Fecha y Hora:</label>
+                    <input type="datetime-local" id="eventDateTime" class="p-2 border rounded">
+                    <label data-english="Guests:" data-spanish="Invitados:">Invitados:</label>
+                    <input type="text" id="eventGuests" data-english-placeholder="Guest names" data-spanish-placeholder="Nombres de invitados" placeholder="Guest names" class="p-2 border rounded">
+                    <label data-english="Location:" data-spanish="Ubicación:">Ubicación:</label>
+                    <input type="text" id="eventLocation" data-english-placeholder="Event location" data-spanish-placeholder="Ubicación del evento" placeholder="Event location" class="p-2 border rounded">
+                    <label data-english="Description:" data-spanish="Descripción:">Descripción:</label>
+                    <textarea id="eventDescription" data-english-placeholder="Event description" data-spanish-placeholder="Descripción del evento" placeholder="Event description" class="p-2 border rounded"></textarea>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="eventTts" class="form-checkbox">
+                        <label for="eventTts" data-english="Enable Text-to-Speech for Reminder" data-spanish="Habilitar Texto a Voz para Recordatorio">Habilitar Texto a Voz para Recordatorio</label>
+                    </div>
+                    <label data-english="Remind me:" data-spanish="Recordarme:">Recordarme:</label>
+                    <select id="eventReminderOffset" class="p-2 border rounded">
+                        <option value="0" data-english="At event time" data-spanish="A la hora del evento">A la hora del evento</option>
+                        <option value="5" data-english="5 minutes before" data-spanish="5 minutos antes">5 minutos antes</option>
+                        <option value="10" data-english="10 minutes before" data-spanish="10 minutos antes">10 minutos antes</option>
+                        <option value="30" data-english="30 minutes before" data-spanish="30 minutos antes">30 minutos antes</option>
+                        <option value="60" data-english="1 hour before" data-spanish="1 hora antes">1 hora antes</option>
+                    </select>
+                    <button onclick="setEventReminder()" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded" data-english="Set Event" data-spanish="Establecer Evento">Establecer Evento</button>
+                </div>
+                <div class="events-list" id="eventList">
+                    <h3 class="font-bold mt-4" data-english="Saved Events" data-spanish="Eventos Guardados">Eventos Guardados</h3>
+                    <ul class="list-disc pl-5"></ul>
+                </div>
+            </div>
+            <div id="taskContent" class="tab-content">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="Task Manager" data-spanish="Gestor de Tareas">Gestor de Tareas</h2>
+                <div class="flex flex-col space-y-2">
+                    <label data-english="Subject:" data-spanish="Asunto:">Asunto:</label>
+                    <input type="text" id="taskSubject" data-english-placeholder="Task subject" data-spanish-placeholder="Asunto de la tarea" placeholder="Task subject" class="p-2 border rounded">
+                    <label data-english="Description:" data-spanish="Descripción:">Descripción:</label>
+                    <textarea id="taskDescription" data-english-placeholder="Task description" data-spanish-placeholder="Descripción de la tarea" placeholder="Task description" class="p-2 border rounded"></textarea>
+                    <label data-english="Date & Time:" data-spanish="Fecha y Hora:">Fecha y Hora:</label>
+                    <input type="datetime-local" id="taskDateTime" class="p-2 border rounded">
+                    <label data-english="Urgency:" data-spanish="Urgencia:">Urgencia:</label>
+                    <select id="taskUrgency" class="p-2 border rounded">
+                        <option value="low" data-english="Low" data-spanish="Baja">Baja</option>
+                        <option value="medium" data-english="Medium" data-spanish="Media">Media</option>
+                        <option value="high" data-english="High" data-spanish="Alta">Alta</option>
+                    </select>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="taskTts" class="form-checkbox">
+                        <label for="taskTts" data-english="Enable Text-to-Speech for Reminder" data-spanish="Habilitar Texto a Voz para Recordatorio">Habilitar Texto a Voz para Recordatorio</label>
+                    </div>
+                    <label data-english="Remind me:" data-spanish="Recordarme:">Recordarme:</label>
+                    <select id="taskReminderOffset" class="p-2 border rounded">
+                        <option value="0" data-english="At task time" data-spanish="A la hora de la tarea">A la hora de la tarea</option>
+                        <option value="5" data-english="5 minutes before" data-spanish="5 minutos antes">5 minutos antes</option>
+                        <option value="10" data-english="10 minutes before" data-spanish="10 minutos antes">10 minutos antes</option>
+                        <option value="30" data-english="30 minutes before" data-spanish="30 minutos antes">30 minutos antes</option>
+                        <option value="60" data-english="1 hour before" data-spanish="1 hora antes">1 hora antes</option>
+                    </select>
+                    <button onclick="saveTask()" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded" data-english="Save Task" data-spanish="Guardar Tarea">Guardar Tarea</button>
+                </div>
+                <div class="task-list" id="taskListContainer">
+                    <h3 class="font-bold mt-4" data-english="Saved Tasks" data-spanish="Tareas Guardadas">Tareas Guardadas</h3>
+                    <ul id="taskList" class="list-disc pl-5"></ul>
+                </div>
+            </div>
+            <div id="appointmentContent" class="tab-content">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="Appointment Schedule" data-spanish="Agenda de Citas">Agenda de Citas</h2>
+                <div class="flex flex-col space-y-2">
+                    <label data-english="Client Name:" data-spanish="Nombre del Cliente:">Nombre del Cliente:</label>
+                    <input type="text" id="clientName" data-english-placeholder="Client Name" data-spanish-placeholder="Nombre del Cliente" placeholder="Client Name" class="p-2 border rounded">
+                    <label data-english="Date & Time:" data-spanish="Fecha y Hora:">Fecha y Hora:</label>
+                    <input type="datetime-local" id="appointmentDateTime" class="p-2 border rounded">
+                    <label data-english="Notes:" data-spanish="Notas:">Notas:</label>
+                    <textarea id="appointmentNotes" data-english-placeholder="Appointment notes" data-spanish-placeholder="Notas de la cita" placeholder="Appointment notes" class="p-2 border rounded"></textarea>
+                    <button onclick="saveAppointment()" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded" data-english="Save Appointment" data-spanish="Guardar Cita">Guardar Cita</button>
+                </div>
+                <div class="appointment-list" id="appointmentListContainer">
+                    <h3 class="font-bold mt-4" data-english="Scheduled Appointments" data-spanish="Citas Programadas">Citas Programadas</h3>
+                    <ul id="appointmentList" class="list-disc pl-5"></ul>
+                </div>
+            </div>
+            <div id="searchContent" class="tab-content">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="Search Notepad" data-spanish="Buscar en el Bloc de Notas">Buscar en el Bloc de Notas</h2>
+                <div class="flex flex-col space-y-2">
+                    <label data-english="Search Term:" data-spanish="Término de Búsqueda:">Término de Búsqueda:</label>
+                    <input type="text" id="globalSearchTerm" data-english-placeholder="Enter text to search for..." data-spanish-placeholder="Introduce texto para buscar..." placeholder="Enter text to search for..." class="p-2 border rounded">
+                    <button onclick="performGlobalSearch()" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded" data-english="Search" data-spanish="Buscar">Buscar</button>
+                </div>
+                <div class="mt-4">
+                    <h3 class="font-bold" data-english="Search Results" data-spanish="Resultados de Búsqueda">Resultados de Búsqueda</h3>
+                    <ul id="searchResults" class="list-disc pl-5"></ul>
+                </div>
+            </div>
+            <div id="diaryContent" class="tab-content">
+                <div class="page flex flex-col items-start">
+                    <h2 id="diaryGreeting" class="text-2xl font-bold text-gray-800 w-full" data-english="Welcome to your Diary!" data-spanish="¡Bienvenido a tu Diario!">¡Bienvenido a tu Diario!</h2>
+                    <img id="diary-profile-pic" src="" alt="Profile Picture" class="hidden">
+                    <div class="flex-container">
+                        <div class="sub-section">
+                            <h3 class="text-xl font-bold mb-2" data-english="Morning Pages" data-spanish="Páginas Matutinas">Páginas Matutinas <span class="text-sm italic font-normal" data-english="(Free writing your thoughts)" data-spanish="(Escritura libre de tus pensamientos)">(Escritura libre de tus pensamientos)</span></h3>
+                            <input type="date" id="morningPagesDate" class="p-2 border rounded w-full mb-2">
+                            <textarea id="morningPagesText" data-english-placeholder="Write your thoughts here..." data-spanish-placeholder="Escribe tus pensamientos aquí..." placeholder="Escribe tus pensamientos aquí..." class="w-full p-2 border rounded flex-1"></textarea>
+                            <button onclick="saveMorningPages()" class="px-4 py-2 bg-blue-500 text-white rounded mt-2" data-english="Save Entry" data-spanish="Guardar Entrada">Guardar Entrada</button>
+                            <div class="list-container mt-4 overflow-y-auto border p-2 rounded">
+                                <h4 class="font-bold mb-2" data-english="Saved Entries" data-spanish="Entradas Guardadas">Entradas Guardadas</h4>
+                                <ul id="morningPagesList" class="list-disc pl-5"></ul>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <h3 class="text-xl font-bold mb-2" data-english="Goals & Objectives" data-spanish="Metas y Objetivos">Metas y Objetivos</h3>
+                            <div class="flex mb-2">
+                                <input type="text" id="goalInput" data-english-placeholder="New goal..." data-spanish-placeholder="Nueva meta..." placeholder="New goal..." class="p-2 border rounded flex-1">
+                                <button onclick="addGoal()" class="px-4 py-2 bg-blue-500 text-white rounded ml-2" data-english="Add" data-spanish="Añadir">Añadir</button>
+                            </div>
+                            <div class="list-container overflow-y-auto border p-2 rounded flex-1">
+                                <h4 class="font-bold mb-2" data-english="My Goals" data-spanish="Mis Metas">Mis Metas</h4>
+                                <ul id="goalsList" class="list-disc pl-5"></ul>
+                            </div>
+                        </div>
+                        <div class="sub-section">
+                            <h3 class="text-xl font-bold mb-2" data-english="Calendar & Notes" data-spanish="Calendario y Notas">Calendario y Notas</h3>
+                            <input type="date" id="diaryDateSelector" class="p-2 border rounded w-full mb-2">
+                            <textarea id="diaryNotes" data-english-placeholder="Write your diary entry..." data-spanish-placeholder="Escribe tu entrada del diario..." placeholder="Escribe tu entrada del diario..." class="w-full p-2 border rounded flex-1"></textarea>
+                            <div class="flex mt-2 gap-2">
+                                <input type="file" id="fileImport" class="p-2 border rounded" multiple>
+                                <button onclick="saveDiaryEntry()" class="px-4 py-2 bg-blue-500 text-white rounded" data-english="Save Entry" data-spanish="Guardar Entrada">Guardar Entrada</button>
+                            </div>
+                            <div class="file-list-container mt-4 overflow-y-auto border p-2 rounded">
+                                <h4 class="font-bold mb-2" data-english="Attached Files" data-spanish="Archivos Adjuntos">Archivos Adjuntos</h4>
+                                <ul id="attachedFilesList" class="file-list"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="aboutContent" class="tab-content">
+                <div class="about-content">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="About the Notepad" data-spanish="Acerca del Bloc de Notas">Acerca del Bloc de Notas</h2>
+                    <p data-english="Developed by Solomon Amadi - C.E.O and Founder of Solomon Amadi Ltd." data-spanish="Desarrollado por Solomon Amadi - C.E.O y Fundador de Solomon Amadi Ltd.">Developed by Solomon Amadi - C.E.O and Founder of Solomon Amadi Ltd.</p>
+                    <p data-english="We're committed to making this notepad accessible and intuitive for everyone! Currently, our app **fluently supports both English and Spanish**, allowing a wider audience to dive into its rich features. We're actively working to **expand our linguistic horizons**, with more languages on the way soon!" data-spanish="¡Estamos comprometidos a hacer que este bloc de notas sea accesible e intuitivo para todos! Actualmente, nuestra aplicación **es compatible con inglés y español**, lo que permite que una audiencia más amplia explore sus ricas funciones. ¡Estamos trabajando activamente para **expandir nuestros horizontes lingüísticos**, con más idiomas en camino pronto!">We're committed to making this notepad accessible and intuitive for everyone! Currently, our app **fluently supports both English and Spanish**, allowing a wider audience to dive into its rich features. We're actively working to **expand our linguistic horizons**, with more languages on the way soon!</p>
+                    <h3 class="text-xl font-bold mt-4" data-english="Features of the Notepad:" data-spanish="Características del Bloc de Notas:">Características del Bloc de Notas:</h3>
+                    <ul>
+                        <li data-english="**Dynamic Tabs:** Seamlessly navigate through a suite of powerful tools with our intuitive dynamic tabs, designed for effortless workflow management." data-spanish="**Pestañas Dinámicas:** Navega sin esfuerzo a través de un conjunto de potentes herramientas con nuestras pestañas dinámicas e intuitivas, diseñadas para una gestión de flujo de trabajo sin complicaciones."><strong>Dynamic Tabs:</strong> Seamlessly navigate through a suite of powerful tools with our intuitive dynamic tabs, designed for effortless workflow management.</li>
+                        <li data-english="**Handwriting Pad:** A digital canvas for your most creative ideas. Draw, sketch, and doodle with precision, just like on real paper, but with endless possibilities." data-spanish="**Bloc de Escritura:** Un lienzo digital para tus ideas más creativas. Dibuja, esboza y garabatea con precisión, como en papel real, pero con infinitas posibilidades."><strong>Handwriting Pad:</strong> A digital canvas for your most creative ideas. Draw, sketch, erase, and doodle with precision, just like on real paper, but with endless possibilities.</li>
+                        <li data-english="**Audio Notes:** Capture thoughts and ideas on the go with crystal-clear audio notes. Record, save, play, and effortlessly organize your spoken insights." data-spanish="**Notas de Audio:** Captura pensamientos e ideas sobre la marcha con notas de audio nítidas. Graba, guarda, reproduce y organiza sin esfuerzo tus reflexiones habladas."><strong>Audio Notes:</strong> Capture thoughts and ideas on the go with crystal-clear audio notes. Record, save, play, and effortlessly organize your spoken insights.</li>
+                        <li data-english="**Events & Tasks:** Master your schedule with our intelligent Event and Task Manager. Set personalized reminders with text-to-speech, ensuring you never miss a beat." data-spanish="**Eventos y Tareas:** Domina tu agenda con nuestro gestor inteligente de Eventos y Tareas. Establece recordatorios personalizados con texto a voz, asegurándote de no perderte nada."><strong>Events & Tasks:</strong> Master your schedule with our intelligent Event and Task Manager. Set personalized reminders with text-to-speech, ensuring you never miss a beat.</li>
+                        <li data-english="**Global Search:** Uncover information instantly across all your notes, events, tasks, and appointments with our lightning-fast global search, putting knowledge at your fingertips." data-spanish="**Búsqueda Global:** Descubre información al instante en todas tus notas, eventos, tareas y citas con nuestra búsqueda global ultrarrápida, poniendo el conocimiento a tu alcance."><strong>Global Search:</strong> Uncover information instantly across all your notes, events, tasks, and appointments with our lightning-fast global search, putting knowledge at your fingertips.</li>
+                        <li data-english="**Personal Diary:** Your sanctuary for reflection: a password-protected digital diary. Chronicle daily entries, cultivate mindfulness with morning pages, track your aspirations, and maintain a rich personal profile." data-spanish="**Diario Personal:** Tu santuario para la reflexión: un diario digital protegido por contraseña. Registra entradas diarias, cultiva la atención plena con páginas matutinas, sigue tus aspiraciones y mantén un perfil personal completo."><strong>Personal Diary:</strong> Your sanctuary for reflection: a password-protected digital diary. Chronicle daily entries, cultivate mindfulness with morning pages, track your aspirations, and maintain a rich personal profile.</li>
+                        <li data-english="**Dual Security:** Experience enhanced privacy with our dual-layer security. A unique PIN secures general access, while a separate robust password safeguards your most personal diary entries." data-spanish="**Doble Seguridad:** Experimenta una privacidad mejorada con nuestra seguridad de doble capa. Un PIN único protege el acceso general, mientras que una contraseña robusta separada salvaguarda tus entradas de diario más personales."><strong>Dual Security:</strong> Experience enhanced privacy with our dual-layer security. A unique PIN secures general access, while a separate robust password safeguards your most personal diary entries.</li>
+                    </ul>
+                    <p class="mt-4 italic text-gray-700 font-semibold" data-english="Disclaimer: This notepad does not send any data to the developers. All data is private and stored only on your device, meaning it cannot be accessed on multiple devices." data-spanish="Aviso Legal: Este bloc de notas no envía ningún dato a los desarrolladores. Todos los datos son privados y se almacenan solo en tu dispositivo, lo que significa que no se puede acceder a ellos desde varios dispositivos.">Disclaimer: This notepad does not send any data to the developers. All data is private and stored only on your device, meaning it cannot be accessed on multiple devices.</p>
+                    <p><span data-english="Your feedback is invaluable! Feel free to reach out to the developer with any complaints, suggestions, or ideas. We're here to listen and continuously improve the app to make it even more suitable for your needs. We'd love to hear from you!" data-spanish="¡Tu opinión es invaluable! No dudes en ponerte en contacto con el desarrollador con cualquier queja, sugerencia o idea. Estamos aquí para escuchar y mejorar continuamente la aplicación para hacerla aún más adecuada a tus necesidades. ¡Nos encantaría saber de ti!"></span></p>
+                    <p><span data-english="Contact(email):" data-spanish="Contacto (correo electrónico):"></span> <a href="mailto:thesolomonamadi@gmail.com">thesolomonamadi@gmail.com</a></p>
+                    <p><span data-english="LinkedIn:" data-spanish="LinkedIn:"></span> <a href="https://linkedin.com/in/solomon-amadi-a0239035a" target="_blank">linkedin.com/in/solomon-amadi-a0239035a</a></p>
+                    <p data-english="Copyright: © Solomon Amadi, All Rights Reserved" data-spanish="Derechos de Autor: © Solomon Amadi, Todos los Derechos Reservados">Copyright: © Solomon Amadi, All Rights Reserved</p>
+                </div>
+            </div>
+            <div id="instructionsContent" class="tab-content">
+                <div class="page">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="How to Use Your Notepad" data-spanish="Cómo Usar Tu Bloc de Notas">How to Use Your Notepad</h2>
+                    <p data-english="Welcome to your Solomon Amadi Notepad! This guide will help you get started with all the powerful features." data-spanish="¡Bienvenido a tu Bloc de Notas Solomon Amadi! Esta guía te ayudará a empezar con todas sus potentes funciones.">Welcome to your Solomon Amadi Notepad! This guide will help you get started with all the powerful features.</p>
+
+                    <h3 class="text-xl font-bold mt-4" data-english="Text Notes (📝)" data-spanish="Notas de Texto (📝)">Text Notes (📝)</h3>
+                    <ul class="list-disc pl-5">
+                        <li data-english="Type &amp; Save: Write your notes in the large text area and click 'Save Text'." data-spanish="Escribir y Guardar: Escribe tus notas en el área de texto grande y haz clic en 'Guardar Texto'."><strong>Type &amp; Save:</strong> Write your notes in the large text area and click 'Save Text'.</li>
+                        <li data-english="Text to Speech: Click 'Text to Speech' to hear your notes read aloud. Supports multiple languages." data-spanish="Texto a Voz: Haz clic en 'Texto a Voz' para escuchar tus notas en voz alta. Soporta múltiples idiomas."><strong>Text to Speech:</strong> Click 'Text to Speech' to hear your notes read aloud. Supports multiple languages.</li>
+                        <li data-english="Search: Use the search bar to find specific text within your notes." data-spanish="Buscar: Usa la barra de búsqueda para encontrar texto específico dentro de tus notas."><strong>Search:</strong> Use the search bar to find specific text within your notes.</li>
+                        <li data-english="Export: Export your notes as PDF or TXT files." data-spanish="Exportar: Exporta tus notas como archivos PDF o TXT."><strong>Export:</strong> Export your notes as PDF or TXT files.</li>
+                        <li data-english="Reminders: Set date and time reminders for your important notes." data-spanish="Recordatorios: Establece recordatorios de fecha y hora para tus notas importantes."><strong>Reminders:</strong> Set date and time reminders for your important notes.</li>
+                    </ul>
+                    <hr class="my-4">
+
+                    <h3 class="text-xl font-bold mt-4" data-english="Handwriting Pad (✍️)" data-spanish="Bloc de Escritura (✍️)">Handwriting Pad (✍️)</h3>
+                    <ul class="list-disc pl-5">
+                        <li data-english="Draw &amp; Doodle: Use the canvas to draw or write freehand." data-spanish="Dibujar y Garabatear: Usa el lienzo para dibujar o escribir a mano alzada."><strong>Draw &amp; Doodle:</strong> Use the canvas to draw or write freehand.</li>
+                        <li data-english="Customize Pen: Select your desired pen color and size." data-spanish="Personalizar Lápiz: Selecciona el color y tamaño de lápiz deseado."><strong>Customize Pen:</strong> Select your desired pen color and size.</li>
+                        <li data-english="Erase: Use the 'Eraser' tool to correct mistakes." data-spanish="Borrar: Usa la herramienta 'Borrador' para corregir errores."><strong>Erase:</strong> Use the 'Eraser' tool to correct mistakes.</li>
+                        <li data-english="Clear: Click 'Clear' to wipe the canvas clean." data-spanish="Limpiar: Haz clic en 'Limpiar' para borrar el lienzo."><strong>Clear:</strong> Click 'Clear' to wipe the canvas clean.</li>
+                        <li data-english="Export: Save your drawings as JPG or PNG images." data-spanish="Exportar: Guarda tus dibujos como imágenes JPG o PNG."><strong>Export:</strong> Save your drawings as JPG or PNG images.</li>
+                    </ul>
+                    <hr class="my-4">
+
+                    <h3 class="text-xl font-bold mt-4" data-english="Audio Notes (🎤)" data-spanish="Notas de Audio (🎤)">Audio Notes (🎤)</h3>
+                    <ul class="list-disc pl-5">
+                        <li data-english="Record: Click '&#128308; Record' to start recording audio." data-spanish="Grabar: Haz clic en '&#128308; Grabar' para empezar a grabar audio."><strong>Record:</strong> Click '&#128308; Record' to start recording audio.</li>
+                        <li data-english="Pause/Stop: Use '&#9208; Pause' and '&#9209; Stop' to manage your recording." data-spanish="Pausar/Detener: Usa '&#9208; Pausar' y '&#9209; Detener' para gestionar tu grabación."><strong>Pause/Stop:</strong> Use '&#9208; Pause' and '&#9209; Stop' to manage your recording.</li>
+                        <li data-english="Describe &amp; Save: Add a description and your audio note will be saved in the list below." data-spanish="Describir y Guardar: Añade una descripción y tu nota de audio se guardará en la lista de abajo."><strong>Describe &amp; Save:</strong> Add a description and your audio note will be saved in the list below.</li>
+                        <li data-english="Play &amp; Delete: Click on a saved audio note to play it, or delete it using the trash icon." data-spanish="Reproducir y Eliminar: Haz clic en una nota de audio guardada para reproducirla, o elimínala usando el icono de la papelera."><strong>Play &amp; Delete:</strong> Click on a saved audio note to play it, or delete it using the trash icon.</li>
+                    </ul>
+                    <hr class="my-4">
+
+                    <h3 class="text-xl font-bold mt-4" data-english="Events &amp; Tasks (🗓️✔️)" data-spanish="Eventos y Tareas (🗓️✔️)">Events &amp; Tasks (🗓️✔️)</h3>
+                    <ul class="list-disc pl-5">
+                        <li data-english="Event Scheduler: Plan your events with date, time, guests, location, and description. Set TTS reminders." data-spanish="Programador de Eventos: Planifica tus eventos con fecha, hora, invitados, ubicación y descripción. Establece recordatorios con Texto a Voz."><strong>Event Scheduler:</strong> Plan your events with date, time, guests, location, and description. Set TTS reminders.</li>
+                        <li data-english="Task Manager: Organize your tasks by subject, description, date, time, and urgency. Set TTS reminders." data-spanish="Gestor de Tareas: Organiza tus tareas por asunto, descripción, fecha, hora y urgencia. Establece recordatorios con Texto a Voz."><strong>Task Manager:</strong> Organize your tasks by subject, description, date, time, and urgency. Set TTS reminders.</li>
+                        <li data-english="Appointment Schedule: Keep track of client appointments with names, date, time, and notes." data-spanish="Agenda de Citas: Lleva un registro de las citas de los clientes con nombres, fecha, hora y notas."><strong>Appointment Schedule:</strong> Keep track of client appointments with names, date, time, and notes.</li>
+                    </ul>
+                    <hr class="my-4">
+
+                    <h3 class="text-xl font-bold mt-4" data-english="Global Search (🔍)" data-spanish="Búsqueda Global (🔍)">Global Search (🔍)</h3>
+                    <ul class="list-disc pl-5">
+                        <li data-english="Search Everything: Use the 'Search Notepad' tab to find text across all your saved notes, events, tasks, and appointments." data-spanish="Buscar en Todo: Usa la pestaña 'Buscar en el Bloc de Notas' para encontrar texto en todas tus notas, eventos, tareas y citas guardadas."><strong>Search Everything:</strong> Use the 'Search Notepad' tab to find text across all your saved notes, events, tasks, and appointments.</li>
+                        <li data-english="View Results: Search results will be displayed in a list." data-spanish="Ver Resultados: Los resultados de la búsqueda se mostrarán en una lista."><strong>View Results:</strong> Search results will be displayed in a list.</li>
+                    </ul>
+                    <hr class="my-4">
+
+                    <h3 class="text-xl font-bold mt-4" data-english="Personal Diary (📖)" data-spanish="Diario Personal (📖)">Personal Diary (📖)</h3>
+                    <ul class="list-disc pl-5">
+                        <li data-english="Secure Access: This section is protected by a separate password." data-spanish="Acceso Seguro: Esta sección está protegida por una contraseña separada."><strong>Secure Access:</strong> This section is protected by a separate password.</li>
+                        <li data-english="Morning Pages: Write daily free-form thoughts with date tracking." data-spanish="Páginas Matutinas: Escribe pensamientos diarios de forma libre con seguimiento de fecha."><strong>Morning Pages:</strong> Write daily free-form thoughts with date tracking.</li>
+                        <li data-english="Goals &amp; Objectives: Add and manage your personal goals." data-spanish="Metas y Objetivos: Añade y gestiona tus metas personales."><strong>Goals &amp; Objectives:</strong> Add and manage your personal goals.</li>
+                        <li data-english="Calendar &amp; Notes: Write general diary entries for specific dates and attach files." data-spanish="Calendario y Notas: Escribe entradas de diario generales para fechas específicas y adjunta archivos."><strong>Calendar &amp; Notes:</strong> Write general diary entries for specific dates and attach files.</li>
+                        <li data-english="File Management: View and delete attached files from your diary entries." data-spanish="Gestión de Archivos: Visualiza y elimina archivos adjuntos de tus entradas del diario."><strong>File Management:</strong> View and delete attached files from your diary entries.</li>
+                    </ul>
+                    <hr class="my-4">
+
+                    <h3 class="text-xl font-bold mt-4" data-english="Security &amp; Profile (🔒👤)" data-spanish="Seguridad y Perfil (🔒👤)">Security &amp; Profile (🔒👤)</h3>
+                    <ul class="list-disc pl-5">
+                        <li data-english="Set PIN &amp; Password: Secure your notepad with a 4-digit PIN and your diary with an 8-character password." data-spanish="Establecer PIN y Contraseña: Protege tu bloc de notas con un PIN de 4 dígitos y tu diario con una contraseña de 8 caracteres."><strong>Set PIN &amp; Password:</strong> Secure your notepad with a 4-digit PIN and your diary with an 8-character password.</li>
+                        <li data-english="Profile Management: Update your name, sex, date of birth, country, phone, and profile picture." data-spanish="Gestión de Perfil: Actualiza tu nombre, sexo, fecha de nacimiento, país, teléfono y foto de perfil."><strong>Profile Management:</strong> Update your name, sex, date of birth, country, phone, and profile picture.</li>
+                        <li data-english="Language Selection: Switch between English and Spanish in the 'Security Settings' tab." data-spanish="Selección de Idioma: Cambia entre inglés y español en la pestaña 'Configuración de Seguridad'."><strong>Language Selection:</strong> Switch between English and Spanish in the 'Security Settings' tab.</li>
+                        <li data-english="Login History: View your login activity in the 'Login History' tab." data-spanish="Historial de Inicio de Sesión: Visualiza tu actividad de inicio de sesión en la pestaña 'Historial de Inicio de Sesión'."><strong>Login History:</strong> View your login activity in the 'Login History' tab.</li>
+                        <li data-english="Reset: Reset all data and security settings using your security question via the initial screen 'Reset' button." data-spanish="Restablecer: Restablece todos los datos y la configuración de seguridad usando tu pregunta de seguridad a través del botón 'Reset' en la pantalla inicial."><strong>Reset:</strong> Reset all data and security settings using your security question via the initial screen 'Reset' button.</li>
+                    </ul>
+
+                    <p class="mt-8 text-lg font-semibold" data-english="For any questions or suggestions, please reach out to the developer via the About tab! We're always looking to improve." data-spanish="Para cualquier pregunta o sugerencia, ¡por favor contacta al desarrollador a través de la pestaña Acerca de! Siempre estamos buscando mejorar.">For any questions or suggestions, please reach out to the developer via the About tab! We're always looking to improve.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        let currentTab = "text";
+        let notepadPin = localStorage.getItem('notepadPin') || null;
+        let diaryPassword = localStorage.getItem('diaryPassword') || null;
+        let securityQuestion = localStorage.getItem('securityQuestion') || null;
+        let securityAnswer = localStorage.getItem('securityAnswer') || null;
+        let loginHistory = JSON.parse(localStorage.getItem('loginHistory')) || [];
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioList = JSON.parse(localStorage.getItem('audioList')) || [];
+        let appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        let events = JSON.parse(localStorage.getItem('events')) || [];
+        let morningPages = JSON.parse(localStorage.getItem('morningPages')) || [];
+        let goals = JSON.parse(localStorage.getItem('goals')) || [];
+        let profile = JSON.parse(localStorage.getItem('profile')) || {};
+        let diaryEntries = JSON.parse(localStorage.getItem('diaryEntries')) || {};
+        let audioStream = null;
+
+        // Handwriting Canvas Variables
+        let canvas, ctx, isDrawing = false, lastX = 0, lastY = 0;
+        let penColor = '#000000';
+        let penSize = 2;
+        let currentTool = 'pen'; // 'pen' or 'eraser'
+        let canvasBackgroundColor = '#ffffff'; // Ensure canvas background matches page for eraser
+
+        // Language Translation Variables (now hardcoded for full app)
+        let currentLanguage = localStorage.getItem('appLanguage') || 'en';
+
+        // --- Utility Functions for Displaying Messages (Replacing alert/confirm) ---
+        function displayMessage(message, type = 'info') {
+            const messageBox = document.createElement('div');
+            messageBox.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: ${type === 'error' ? '#f8d7da' : '#d4edda'};
+                color: ${type === 'error' ? '#721c24' : '#155724'};
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                z-index: 2000;
+                text-align: center;
+                max-width: 80%;
+                font-family: 'Poppins', sans-serif;
+                transition: opacity 0.3s ease-in-out;
+            `;
+            // Dynamic message translation
+            const translatedMessage = {
+                'en': {
+                    'Reminder!': 'Reminder!',
+                    'Please select a future time for the reminder.': 'Please select a future time for the reminder.',
+                    'Text saved!': 'Text saved!',
+                    'Are you sure you want to delete this saved text?': 'Are you sure you want to delete this saved text?',
+                    'Saved text deleted!': 'Saved text deleted!',
+                    'Please write some text to export.': 'Please write some text to export.',
+                    'Handwriting exported as JPG!': 'Handwriting exported as JPG!',
+                    'Handwriting exported as PNG!': 'Handwriting exported as PNG!',
+                    'Could not access microphone. Please ensure permissions are granted.': 'Could not access microphone. Please ensure permissions are granted.',
+                    'Audio note deleted!': 'Audio note deleted!',
+                    'Event reminder set successfully!': 'Event reminder set successfully!',
+                    'Please select a valid date and time.': 'Please select a valid date and time.',
+                    'Please select a future date and time.': 'Please select a future date and time.',
+                    'Event deleted!': 'Event deleted!',
+                    'Task saved successfully!': 'Task saved successfully!',
+                    'Please fill in task subject and date/time.': 'Please fill in task subject and date/time.',
+                    'Task deleted!': 'Task deleted!',
+                    'Appointment saved!': 'Appointment saved!',
+                    'Please fill in client name and date/time.': 'Please fill in client name and date/time.',
+                    'Appointment deleted!': 'Appointment deleted!',
+                    'No results found for': 'No results found for',
+                    'Please set a Diary password in the \'Secure\' tab first.': 'Please set a Diary password in the \'Secure\' tab first.',
+                    'Please set a notepad PIN in the \'Secure\' tab first.': 'Please set a notepad PIN in the \'Secure\' tab first.',
+                    'Please set both Notepad PIN and Diary Password for full security.': 'Please set both Notepad PIN and Diary Password for full security.',
+                    'Incorrect PIN.': 'Incorrect PIN.',
+                    'Incorrect Password.': 'Incorrect Password.',
+                    'All fields are required.': 'All fields are required.',
+                    'Notepad PIN must be 4 digits.': 'Notepad PIN must be 4 digits.',
+                    'Notepad PINs do not match.': 'Notepad PINs do not match.',
+                    'Diary password must be 1-8 alphanumeric characters.': 'Diary password must be 1-8 alphanumeric characters.',
+                    'Diary passwords do not match.': 'Diary passwords do not match.',
+                    'Security settings and profile saved!': 'Security settings and profile saved!',
+                    'Profile saved successfully!': 'Profile saved successfully!',
+                    'Are you sure you want to delete your login history?': 'Are you sure you want to delete your login history?',
+                    'Login history deleted!': 'Login history deleted!',
+                    'Are you absolutely sure you want to reset ALL data? This cannot be undone!': 'Are you absolutely sure you want to reset ALL data? This cannot be undone!',
+                    'Incorrect answer. Reset denied.': 'Incorrect answer. Reset denied.',
+                    'Morning pages entry saved!': 'Morning pages entry saved!',
+                    'Please select a date and write some text.': 'Please select a date and write some text.',
+                    'Are you sure you want to delete this morning pages entry?': 'Are you sure you want to delete this morning pages entry?',
+                    'Morning pages entry deleted!': 'Morning pages entry deleted!',
+                    'Congratulations! You accomplished a goal!': 'Congratulations! You accomplished a goal!',
+                    'Please enter a goal.': 'Please enter a goal.',
+                    'Are you sure you want to delete this goal?': 'Are you sure you want to delete this goal?',
+                    'Goal deleted!': 'Goal deleted!',
+                    'Diary entry saved!': 'Diary entry saved!',
+                    'Please select a date.': 'Please select a date.',
+                    'Are you sure you want to delete this file?': 'Are you sure you want to delete this file?',
+                    'File deleted!': 'File deleted!',
+                    'Language set to English!': 'Language set to English!',
+                    'Language set to Spanish!': 'Language set to Spanish!',
+                    'Not found': 'Not found',
+                    'Found at index: ': 'Found at index: ',
+                    'Are you sure you want to delete this audio?': 'Are you sure you want to delete this audio?'
+                },
+                'es': {
+                    'Reminder!': '¡Recordatorio!',
+                    'Please select a future time for the reminder.': 'Por favor, selecciona una hora futura para el recordatorio.',
+                    'Text saved!': '¡Texto guardado!',
+                    'Are you sure you want to delete this saved text?': '¿Estás seguro de que quieres eliminar este texto guardado?',
+                    'Saved text deleted!': '¡Texto guardado eliminado!',
+                    'Please write some text to export.': 'Por favor, escribe algo de texto para exportar.',
+                    'Handwriting exported as JPG!': '¡Escritura a mano exportada como JPG!',
+                    'Handwriting exported as PNG!': '¡Escritura a mano exportada como PNG!',
+                    'Could not access microphone. Please ensure permissions are granted.': 'No se pudo acceder al micrófono. Por favor, asegúrate de que los permisos estén concedidos.',
+                    'Audio note deleted!': '¡Nota de audio eliminada!',
+                    'Event reminder set successfully!': '¡Recordatorio de evento establecido con éxito!',
+                    'Please select a valid date and time.': 'Por favor, selecciona una fecha y hora válidas.',
+                    'Please select a future date and time.': 'Por favor, selecciona una fecha y hora futuras.',
+                    'Event deleted!': '¡Evento eliminado!',
+                    'Task saved successfully!': '¡Tarea guardada con éxito!',
+                    'Please fill in task subject and date/time.': 'Por favor, rellena el asunto y la fecha/hora de la tarea.',
+                    'Task deleted!': '¡Tarea eliminada!',
+                    'Appointment saved!': '¡Cita guardada!',
+                    'Please fill in client name and date/time.': 'Por favor, rellena el nombre del cliente y la fecha/hora.',
+                    'Appointment deleted!': '¡Cita eliminada!',
+                    'No results found for': 'No se encontraron resultados para',
+                    'Please set a Diary password in the \'Secure\' tab first.': 'Por favor, establece una contraseña para el Diario en la pestaña \'Seguridad\' primero.',
+                    'Please set a notepad PIN in the \'Secure\' tab first.': 'Por favor, establece un PIN para el bloc de notas en la pestaña \'Seguridad\' primero.',
+                    'Please set both Notepad PIN and Diary Password for full security.': 'Por favor, establece tanto el PIN del bloc de notas como la contraseña del Diario para una seguridad completa.',
+                    'Incorrect PIN.': 'PIN incorrecto.',
+                    'Incorrect Password.': 'Contraseña incorrecta.',
+                    'All fields are required.': 'Todos los campos son obligatorios.',
+                    'Notepad PIN must be 4 digits.': 'El PIN del bloc de notas debe ser de 4 dígitos.',
+                    'Notepad PINs do not match.': 'Los PINs del bloc de notas no coinciden.',
+                    'Diary password must be 1-8 alphanumeric characters.': 'La contraseña del diario debe ser de 1-8 caracteres alfanuméricos.',
+                    'Diary passwords do not match.': 'Las contraseñas del diario no coinciden.',
+                    'Security settings and profile saved!': '¡Configuración de seguridad y perfil guardados!',
+                    'Profile saved successfully!': '¡Perfil guardado con éxito!',
+                    'Are you sure you want to delete your login history?': '¿Estás seguro de que quieres eliminar tu historial de inicio de sesión?',
+                    'Login history deleted!': '¡Historial de inicio de sesión eliminado!',
+                    'Are you absolutely sure you want to reset ALL data? This cannot be undone!': '¿Estás absolutamente seguro de que quieres restablecer TODOS los datos? ¡Esto no se puede deshacer!',
+                    'Incorrect answer. Reset denied.': 'Respuesta incorrecta. Restablecimiento denegado.',
+                    'Morning pages entry saved!': '¡Entrada de páginas matutinas guardada!',
+                    'Please select a date and write some text.': 'Por favor, selecciona una fecha y escribe algo de texto.',
+                    'Are you sure you want to delete this morning pages entry?': '¿Estás seguro de que quieres eliminar esta entrada de páginas matutinas?',
+                    'Morning pages entry deleted!': '¡Entrada de páginas matutinas eliminada!',
+                    'Congratulations! You accomplished a goal!': '¡Felicidades! ¡Lograste una meta!',
+                    'Please enter a goal.': 'Por favor, introduce una meta.',
+                    'Are you sure you want to delete this goal?': '¿Estás seguro de que quieres eliminar esta meta?',
+                    'Goal deleted!': '¡Meta eliminada!',
+                    'Diary entry saved!': '¡Entrada del diario guardada!',
+                    'Please select a date.': 'Por favor, selecciona una fecha.',
+                    'Are you sure you want to delete this file?': '¿Estás seguro de que quieres eliminar este archivo?',
+                    'File deleted!': '¡Archivo eliminado!',
+                    'Language set to English!': '¡Idioma establecido en inglés!',
+                    'Language set to Spanish!': '¡Idioma establecido en español!',
+                    'Not found': 'No encontrado',
+                    'Found at index: ': 'Encontrado en el índice: ',
+                    'Are you sure you want to delete this audio?': '¿Estás seguro de que quieres eliminar este audio?'
+                }
+            };
+
+            messageBox.textContent = translatedMessage[currentLanguage][message] || message; // Fallback to English if translation not found
+
+            document.body.appendChild(messageBox);
+            setTimeout(() => {
+                messageBox.style.opacity = '0';
+                messageBox.addEventListener('transitionend', () => messageBox.remove());
+            }, 3000); // Message disappears after 3 seconds
+            return messageBox; // Return the message box for potential removal later
+        }
+
+        // Custom confirmation dialog
+        function showConfirm(message, onConfirm, onCancel) {
+            const confirmBox = document.createElement('div');
+            confirmBox.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #fff;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                z-index: 2000;
+                text-align: center;
+                max-width: 400px;
+                font-family: 'Poppins', sans-serif;
+            `;
+
+            // Translate confirmation messages
+            const translatedMessage = {
+                'en': {
+                    "Are you sure you want to delete this file?": "Are you sure you want to delete this file?",
+                    "Are you sure you want to delete this audio?": "Are you sure you want to delete this audio?",
+                    "Are you sure you want to delete this event?": "Are you sure you want to delete this event?",
+                    "Are you sure you want to delete this task?": "Are you sure you want to delete this task?",
+                    "Are you sure you want to delete this appointment?": "Are you sure you want to delete this appointment?",
+                    "Are you sure you want to delete your login history?": "Are you sure you want to delete your login history?",
+                    "Are you absolutely sure you want to reset ALL data? This cannot be undone!": "Are you absolutely sure you want to reset ALL data? This cannot be undone!",
+                    "Are you sure you want to delete this morning pages entry?": "Are you sure you want to delete this morning pages entry?",
+                    "Are you sure you want to delete this goal?": "Are you sure you want to delete this goal?",
+                    "Are you sure you want to delete this saved text?": "Are you sure you want to delete this saved text?",
+                    "Yes": "Yes",
+                    "No": "No"
+                },
+                'es': {
+                    "Are you sure you want to delete this file?": "¿Estás seguro de que quieres eliminar este archivo?",
+                    "Are you sure you want to delete this audio?": "¿Estás seguro de que quieres eliminar este audio?",
+                    "Are you sure you want to delete this event?": "¿Estás seguro de que quieres eliminar este evento?",
+                    "Are you sure you want to delete this task?": "¿Estás seguro de que quieres eliminar esta tarea?",
+                    "Are you sure you want to delete this appointment?": "¿Estás seguro de que quieres eliminar esta cita?",
+                    "Are you sure you want to delete your login history?": "¿Estás seguro de que quieres eliminar tu historial de inicio de sesión?",
+                    "Are you absolutely sure you want to reset ALL data? This cannot be undone!": "¿Estás absolutamente seguro de que quieres restablecer TODOS los datos? ¡Esto no se puede deshacer!",
+                    "Are you sure you want to delete this morning pages entry?": "¿Estás seguro de que quieres eliminar esta entrada de páginas matutinas?",
+                    "Are you sure you want to delete this goal?": "¿Estás seguro de que quieres eliminar esta meta?",
+                    "Are you sure you want to delete this saved text?": "¿Estás seguro de que quieres eliminar este texto guardado?",
+                    "Yes": "Sí",
+                    "No": "No"
+                }
+            };
+
+            confirmBox.innerHTML = `
+                <p class="mb-4">${translatedMessage[currentLanguage][message] || message}</p>
+                <button id="confirm-yes" class="px-4 py-2 bg-green-500 text-white rounded mr-2">${translatedMessage[currentLanguage]["Yes"]}</button>
+                <button id="confirm-no" class="px-4 py-2 bg-red-500 text-white rounded">${translatedMessage[currentLanguage]["No"]}</button>
+            `;
+            document.body.appendChild(confirmBox);
+
+            document.getElementById('confirm-yes').onclick = () => {
+                confirmBox.remove();
+                if (onConfirm) onConfirm();
+            };
+            document.getElementById('confirm-no').onclick = () => {
+                confirmBox.remove();
+                if (onCancel) onCancel();
+            };
+        }
+
+
+        // --- Authentication & Initialization Functions ---
+        function logLogin() {
+            const now = new Date().toLocaleString('en-US', { timeZone: 'Africa/Lagos' });
+            loginHistory.push({ time: now, name: profile.name || 'Unknown' });
+            localStorage.setItem('loginHistory', JSON.stringify(loginHistory));
+        }
+
+        function updateLoginHistory() {
+            const list = document.getElementById('login-history-sidebar');
+            const nameSpan = document.getElementById('registered-name-sidebar');
+
+            if (nameSpan) {
+                nameSpan.textContent = profile.name || 'Not registered';
+            }
+            if (list) {
+                list.innerHTML = loginHistory.map(entry => `<li>${entry.name} - ${entry.time}</li>`).join('');
+            }
+        }
+        
+        function handleOption(option) {
+            document.getElementById('initial-screen').style.display = 'none';
+            if (option === 'login') {
+                if (notepadPin) {
+                    document.getElementById('pin-screen').style.display = 'block';
+                    document.getElementById('pin-title').textContent = (currentLanguage === 'es' ? 'Introduce PIN para Acceder al Bloc de Notas' : 'Enter PIN to Access Notepad');
+                    document.getElementById('profile-container').style.display = 'none';
+                    document.querySelectorAll('#pin-screen input:not(#enter-pin)').forEach(el => el.style.display = 'none');
+                    document.querySelectorAll('#pin-screen select').forEach(el => el.style.display = 'none');
+                    document.getElementById('set').style.display = 'none';
+                    document.getElementById('notepadPin').style.display = 'none';
+                    document.getElementById('notepadPinConfirm').style.display = 'none';
+                    document.getElementById('diaryPassword').style.display = 'none';
+                    document.getElementById('diaryPasswordConfirm').style.display = 'none';
+                    document.getElementById('security-question').style.display = 'none';
+                    document.getElementById('security-answer').style.display = 'none';
+
+                    document.getElementById('enter-pin').value = ''; 
+                    document.getElementById('enter-pin').style.display = 'block';
+                    document.getElementById('verify-pin').style.display = 'block';
+                    document.getElementById('pin-message').textContent = '';
+                } else {
+                    document.getElementById('notepad').style.display = 'flex';
+                    document.querySelector('.sidebar').style.display = 'block';
+                    logLogin();
+                }
+            } else if (option === 'reset') {
+                document.getElementById('reset-confirm').style.display = 'block';
+                document.getElementById('reset-question').textContent = securityQuestion || (currentLanguage === 'es' ? 'No se ha establecido pregunta de seguridad' : 'No security question set');
+                document.getElementById('reset-answer').value = '';
+                document.getElementById('reset-message').textContent = '';
+            }
+        }
+        
+        function verifyPin() {
+            const enteredPin = document.getElementById('enter-pin').value;
+            const hashedPin = CryptoJS.MD5(enteredPin).toString();
+            if (hashedPin === notepadPin) {
+                document.getElementById('pin-screen').style.display = 'none';
+                document.getElementById('notepad').style.display = 'flex';
+                document.querySelector('.sidebar').style.display = 'block';
+                logLogin();
+                // Apply translations once the main app is visible
+                changeLanguage(currentLanguage);
+            } else {
+                displayMessage('Incorrect PIN.', 'error');
+            }
+        }
+
+        async function setPinsAndProfile() {
+            const userName = document.getElementById('user-name-secure').value.trim();
+            const notepadPinVal = document.getElementById('notepadPinSecure').value;
+            const notepadPinConfirmVal = document.getElementById('notepadPinConfirmSecure').value;
+            const diaryPasswordVal = document.getElementById('diaryPasswordSecure').value;
+            const diaryPasswordConfirmVal = document.getElementById('diaryPasswordConfirmSecure').value;
+            const securityQuestionVal = document.getElementById('security-question-secure').value;
+            const securityAnswerVal = document.getElementById('security-answer-secure').value.trim();
+
+            if (!userName || !notepadPinVal || !notepadPinConfirmVal || !diaryPasswordVal || !diaryPasswordConfirmVal || !securityQuestionVal || !securityAnswerVal) {
+                displayMessage('All fields are required.', 'error');
+                return;
+            }
+
+            if (!/^\d{4}$/.test(notepadPinVal)) {
+                displayMessage('Notepad PIN must be 4 digits.', 'error');
+                return;
+            }
+            if (notepadPinVal !== notepadPinConfirmVal) {
+                displayMessage('Notepad PINs do not match.', 'error');
+                return;
+            }
+            if (!/^[a-zA-Z0-9]{1,8}$/.test(diaryPasswordVal)) {
+                displayMessage('Diary password must be 1-8 alphanumeric characters.', 'error');
+                return;
+            }
+            if (diaryPasswordVal !== diaryPasswordConfirmVal) {
+                displayMessage('Diary passwords do not match.', 'error');
+                return;
+            }
+
+            const profileData = {
+                name: userName,
+                sex: document.getElementById('profileSex-secure').value,
+                dob: document.getElementById('profileDob-secure').value,
+                country: document.getElementById('profileCountry-secure').value,
+                phone: document.getElementById('profilePhone-secure').value,
+            };
+
+            const picFile = document.getElementById('profilePic-secure').files[0];
+            if (picFile) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    profileData.pic = e.target.result;
+                    const hashedPin = CryptoJS.MD5(notepadPinVal).toString();
+                    const hashedDiaryPassword = CryptoJS.MD5(diaryPasswordVal).toString();
+                    const hashedSecurityAnswer = CryptoJS.MD5(securityAnswerVal).toString();
+                    saveAllData(profileData, hashedPin, hashedDiaryPassword, securityQuestionVal, hashedSecurityAnswer);
+                };
+                reader.readAsDataURL(picFile);
+            } else {
+                profileData.pic = profile.pic || "";
+                const hashedPin = CryptoJS.MD5(notepadPinVal).toString();
+                const hashedDiaryPassword = CryptoJS.MD5(diaryPasswordVal).toString();
+                const hashedSecurityAnswer = CryptoJS.MD5(securityAnswerVal).toString();
+                saveAllData(profileData, hashedPin, hashedDiaryPassword, securityQuestionVal, hashedSecurityAnswer);
+            }
+        }
+
+        function saveAllData(profileData, hashedPin, hashedDiaryPassword, securityQuestionVal, hashedSecurityAnswer) {
+            profile = profileData;
+            notepadPin = hashedPin;
+            diaryPassword = hashedDiaryPassword;
+            securityQuestion = securityQuestionVal;
+            securityAnswer = hashedSecurityAnswer;
+
+            localStorage.setItem('profile', JSON.stringify(profile));
+            localStorage.setItem('notepadPin', notepadPin);
+            localStorage.setItem('diaryPassword', diaryPassword);
+            localStorage.setItem('securityQuestion', securityQuestion);
+            localStorage.setItem('securityAnswer', securityAnswer);
+
+            displayMessage('Security settings and profile saved!');
+            const selectedLang = document.getElementById('language-selector').value;
+            changeLanguage(selectedLang);
+        }
+
+        // Dedicated function to save only profile data (not PINs/passwords)
+        function saveProfileOnly() {
+            const userName = document.getElementById('user-name-secure').value.trim();
+            const profileData = {
+                name: userName,
+                sex: document.getElementById('profileSex-secure').value,
+                dob: document.getElementById('profileDob-secure').value,
+                country: document.getElementById('profileCountry-secure').value,
+                phone: document.getElementById('profilePhone-secure').value,
+            };
+
+            const picFile = document.getElementById('profilePic-secure').files[0];
+            if (picFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profileData.pic = e.target.result;
+                    profile = profileData;
+                    localStorage.setItem('profile', JSON.stringify(profile));
+                    displayMessage('Profile saved successfully!');
+                    updateProfileDisplay();
+                };
+                reader.readAsDataURL(picFile);
+            } else {
+                profile.name = userName; 
+                profile.sex = document.getElementById('profileSex-secure').value;
+                profile.dob = document.getElementById('profileDob-secure').value;
+                profile.country = document.getElementById('profileCountry-secure').value;
+                profile.phone = document.getElementById('profilePhone-secure').value;
+                localStorage.setItem('profile', JSON.stringify(profile));
+                displayMessage('Profile saved successfully!');
+                updateProfileDisplay();
+            }
+        }
+
+        function cancelPin() {
+            document.getElementById('pin-screen').style.display = 'none';
+            document.getElementById('initial-screen').style.display = 'flex';
+        }
+        function deleteLoginHistory() {
+            showConfirm("Are you sure you want to delete your login history?", () => {
+                loginHistory = [];
+                localStorage.setItem('loginHistory', JSON.stringify(loginHistory));
+                updateLoginHistory();
+                displayMessage('Login history deleted!');
+            });
+        }
+
+        function closeLoginDetails() {
+            document.getElementById('login-details').style.display = 'none';
+            document.getElementById('initial-screen').style.display = 'flex';
+        }
+
+        async function confirmReset() {
+            const resetAnswer = document.getElementById('reset-answer').value.trim();
+            const hashedResetAnswer = CryptoJS.MD5(resetAnswer).toString();
+            if (hashedResetAnswer === securityAnswer) {
+                showConfirm("Are you absolutely sure you want to reset ALL data? This cannot be undone!", () => {
+                    localStorage.clear();
+                    location.reload();
+                });
+            } else {
+                displayMessage('Incorrect answer. Reset denied.', 'error');
+            }
+        }
+
+        function closeReset() {
+            document.getElementById('reset-confirm').style.display = 'none';
+            document.getElementById('initial-screen').style.display = 'flex';
+        }
+        
+        window.onload = function() {
+            updateSaveList();
+            updateAudioList();
+            updateTaskList();
+            updateEventList();
+            updateAppointmentList();
+            updateGoalsList();
+            updateMorningPagesList();
+            document.getElementById('language-selector').value = currentLanguage; 
+            
+            changeLanguage(currentLanguage);
+            setupCanvas();
+        };
+        
+        function showTab(tab) {
+            if (tab === 'diary') {
+                if (diaryPassword) {
+                    document.getElementById('diary-pin-screen').style.display = 'block';
+                    document.getElementById('diary-pin-message').textContent = '';
+                } else {
+                    displayMessage("Please set a Diary password in the 'Secure' tab first.", 'error');
+                    return;
+                }
+                return;
+            }
+            
+            if (tab === 'loginDetails') {
+                if (!notepadPin) {
+                    displayMessage("Please set a notepad PIN in the 'Secure' tab first.", 'error');
+                    return;
+                }
+                
+                document.getElementById('pin-screen').style.display = 'block';
+                document.getElementById('pin-title').textContent = (currentLanguage === 'es' ? 'Introduce PIN para Ver Historial de Inicio de Sesión' : 'Enter PIN to View Login History');
+                document.getElementById('profile-container').style.display = 'none';
+                document.querySelectorAll('#pin-screen input:not(#enter-pin)').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('#pin-screen select').forEach(el => el.style.display = 'none');
+                    document.getElementById('set').style.display = 'none';
+                document.getElementById('notepadPin').style.display = 'none';
+                document.getElementById('notepadPinConfirm').style.display = 'none';
+                document.getElementById('diaryPassword').style.display = 'none';
+                document.getElementById('diaryPasswordConfirm').style.display = 'none';
+                document.getElementById('security-question').style.display = 'none';
+                document.getElementById('security-answer').style.display = 'none';
+                
+                document.getElementById('enter-pin').value = '';
+                document.getElementById('enter-pin').style.display = 'block';
+                document.getElementById('verify-pin').style.display = 'block';
+                document.getElementById('pin-message').textContent = '';
+
+                document.getElementById('verify-pin').onclick = async function() {
+                    const enteredPin = document.getElementById('enter-pin').value;
+                    const hashedPin = CryptoJS.MD5(enteredPin).toString();
+                    if (hashedPin === notepadPin) {
+                        document.getElementById('pin-screen').style.display = 'none';
+                        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                        document.getElementById('loginDetailsContent').classList.add('active');
+                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        document.querySelector(`.tab[onclick="showTab('loginDetails')"]`).classList.add('active');
+                        updateLoginHistory(); 
+                        changeLanguage(currentLanguage);
+                    } else {
+                        displayMessage('Incorrect PIN.', 'error');
+                    }
+                };
+                return;
+            }
+
+            // Logic for 'secure' tab: only require PIN if both notepadPin and diaryPassword are set
+            if (tab === 'secure') {
+                if (notepadPin && diaryPassword) {
+                    document.getElementById('pin-screen').style.display = 'block';
+                    document.getElementById('pin-title').textContent = (currentLanguage === 'es' ? 'Introduce PIN para Ver Configuración de Seguridad' : 'Enter PIN to View Security Settings');
+                    document.getElementById('profile-container').style.display = 'none';
+                    document.querySelectorAll('#pin-screen input:not(#enter-pin)').forEach(el => el.style.display = 'none');
+                    document.querySelectorAll('#pin-screen select').forEach(el => el.style.display = 'none');
+                    document.getElementById('set').style.display = 'none';
+                    document.getElementById('notepadPin').style.display = 'none';
+                    document.getElementById('notepadPinConfirm').style.display = 'none';
+                    document.getElementById('diaryPassword').style.display = 'none';
+                    document.getElementById('diaryPasswordConfirm').style.display = 'none';
+                    document.getElementById('security-question').style.display = 'none';
+                    document.getElementById('security-answer').style.display = 'none';
+
+                    document.getElementById('enter-pin').value = '';
+                    document.getElementById('enter-pin').style.display = 'block';
+                    document.getElementById('verify-pin').style.display = 'block';
+                    document.getElementById('pin-message').textContent = '';
+
+                    document.getElementById('verify-pin').onclick = async function() {
+                        const enteredPin = document.getElementById('enter-pin').value;
+                        const hashedPin = CryptoJS.MD5(enteredPin).toString();
+                        if (hashedPin === notepadPin) {
+                            document.getElementById('pin-screen').style.display = 'none';
+                            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                            document.getElementById('secureContent').classList.add('active');
+                            loadProfileForEditing(); 
+                            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                            document.querySelector(`.tab[onclick="showTab('secure')"]`).classList.add('active');
+                            changeLanguage(currentLanguage);
+                        } else {
+                            displayMessage('Incorrect PIN.', 'error');
+                        }
+                    };
+                } else {
+                    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                    document.getElementById('secureContent').classList.add('active');
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelector(`.tab[onclick="showTab('secure')"]`).classList.add('active');
+                    loadProfileForEditing(); 
+                    displayMessage("Please set both Notepad PIN and Diary Password for full security.", 'info');
+                    changeLanguage(currentLanguage);
+                }
+                return;
+            }
+
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(`${tab}Content`).classList.add('active');
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[onclick="showTab('${tab}')"]`).classList.add('active');
+            currentTab = tab;
+            changeLanguage(currentLanguage);
+
+            if (tab === 'page3') {
+                setupCanvas();
+            } else if (canvas) {
+                 canvas.removeEventListener('mousedown', startDrawing);
+                canvas.removeEventListener('mousemove', draw);
+                canvas.removeEventListener('mouseup', stopDrawing);
+                canvas.removeEventListener('mouseout', stopDrawing);
+                canvas.removeEventListener('touchstart', startDrawingTouch);
+                canvas.removeEventListener('touchmove', drawTouch);
+                canvas.removeEventListener('touchend', stopDrawing);
+            }
+            if (tab === 'page3audio') {
+                updateAudioList();
+            }
+            if (tab === 'event') {
+                updateEventList();
+            }
+            if (tab === 'task') {
+                updateTaskList();
+            }
+            if (tab === 'appointment') {
+                updateAppointmentList();
+            }
+            if (tab === 'search') {
+                document.getElementById('searchResults').innerHTML = '';
+            }
+        }
+
+        async function verifyDiaryPin() {
+            const enteredPassword = document.getElementById('diary-enter-pin').value;
+            const hashedEnteredPassword = CryptoJS.MD5(enteredPassword).toString();
+            if (hashedEnteredPassword === diaryPassword) {
+                document.getElementById('diary-pin-screen').style.display = 'none';
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.getElementById('diaryContent').classList.add('active');
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelector(`.tab[onclick="showTab('diary')"]`).classList.add('active');
+                updateProfileDisplay();
+                updateGoalsList();
+                updateMorningPagesList();
+                changeLanguage(currentLanguage);
+            } else {
+                displayMessage('Incorrect Password.', 'error');
+            }
+        }
+
+        function cancelDiaryPin() {
+            document.getElementById('diary-pin-screen').style.display = 'none';
+        }
+
+        // --- Text/Notes Functions ---
+        function speakText() {
+            const text = document.getElementById('textArea').value;
+            if (text) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function searchText() {
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+            const text = document.getElementById('textArea').value.toLowerCase();
+            const index = text.indexOf(searchTerm);
+            if (index !== -1) displayMessage((currentLanguage === 'es' ? 'Encontrado en el índice: ' : 'Found at index: ') + index);
+            else displayMessage('Not found', 'error');
+        }
+
+        function saveText() {
+            const text = document.getElementById('textArea').value;
+            if (text) {
+                const id = Date.now();
+                localStorage.setItem(`save_${id}`, text);
+                updateSaveList();
+                displayMessage('Text saved!');
+            }
+        }
+
+        function updateSaveList() {
+            const saveList = document.getElementById('saveList');
+            saveList.innerHTML = '';
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith(`save_`)) {
+                    const div = document.createElement('div');
+                    div.className = 'list-item';
+                    div.innerHTML = `
+                        <span>${localStorage.getItem(key).substring(0, 20)}...</span>
+                        <button onclick="deleteSavedText('${key}')">🗑️</button>
+                    `;
+                    div.onclick = (e) => {
+                         if (e.target.tagName !== 'BUTTON') {
+                            document.getElementById('textArea').value = localStorage.getItem(key);
+                        }
+                    };
+                    saveList.appendChild(div);
+                }
+            }
+        }
+        
+        function deleteSavedText(key) {
+            showConfirm("Are you sure you want to delete this saved text?", () => {
+                localStorage.removeItem(key);
+                updateSaveList();
+                displayMessage('Saved text deleted!');
+            });
+        }
+
+        function setReminder() {
+            const reminderTime = new Date(document.getElementById('reminder').value).getTime();
+            const now = new Date().getTime();
+            const timeDiff = reminderTime - now;
+            if (timeDiff > 0) {
+                setTimeout(() => {
+                    const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
+                    audio.play();
+                    displayMessage('Reminder!');
+                }, timeDiff);
+            } else {
+                displayMessage('Please select a future time for the reminder.', 'error');
+            }
+        }
+
+        // --- Sticky Notes Functions ---
+        function addStickyNote() {
+            const stickyNotes = document.getElementById('stickyNotes');
+            const note = document.createElement('div');
+            note.className = 'sticky-note';
+            note.style.left = Math.random() * (window.innerWidth - 300) + 'px';
+            note.style.top = Math.random() * (window.innerHeight - 300) + 'px';
+            note.innerHTML = `
+                <p class="italic text-gray-600 text-sm mb-2" data-english="Psst... I might wander off!" data-spanish="Psst... ¡Podría irme por ahí!">Psst... I might wander off!</p>
+                <textarea class="w-full h-full bg-transparent border-none resize-none" data-english-placeholder="Write note..." data-spanish-placeholder="Escribir nota..." placeholder="Write note..."></textarea>
+                <button onclick="this.parentElement.remove()">🗑️</button>
+            `;
+            stickyNotes.appendChild(note);
+            changeLanguage(currentLanguage); // Translate new sticky note content
+            
+            let isDragging = false;
+            let initialX, initialY, xOffset = 0, yOffset = 0;
+
+            note.addEventListener('mousedown', (e) => {
+                if (e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
+                    isDragging = true;
+                    initialX = e.clientX - xOffset;
+                    initialY = e.clientY - yOffset;
+                }
+            });
+            // Touch events for sticky notes
+            note.addEventListener('touchstart', (e) => {
+                if (e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
+                    isDragging = true;
+                    const touch = e.touches[0];
+                    initialX = touch.clientX - xOffset;
+                    initialY = touch.clientY - yOffset;
+                }
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                    xOffset = e.clientX - initialX;
+                    yOffset = e.clientY - initialY;
+                    note.style.transform = `translate3d(${xOffset}px, ${yOffset}px, 0)`;
+                }
+            });
+            document.addEventListener('touchmove', (e) => {
+                if (isDragging) {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    xOffset = touch.clientX - initialX;
+                    const rect = note.getBoundingClientRect(); 
+                    yOffset = touch.clientY - rect.top; 
+                    note.style.transform = `translate3d(${xOffset}px, ${yOffset}px, 0)`;
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+            document.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+        }
+        
+        function exportFile(format = 'pdf') {
+            const text = document.getElementById('textArea').value;
+            if (!text) {
+                displayMessage("Please write some text to export.", 'error');
+                return;
+            }
+            const fileName = (currentLanguage === 'es' ? 'solomon_amadi_pagina1' : 'solomon_amadi_page1');
+            if (format === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.text(text, 10, 10);
+                doc.save(`${fileName}.pdf`);
+                displayMessage(`Handwriting exported as PDF!`);
+            } else if (format === 'txt') {
+                const blob = new Blob([text], { type: 'text/plain' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `${fileName}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                displayMessage(`Handwriting exported as TXT!`);
+            }
+        }
+        
+        // --- Handwriting Pad Functions ---
+        function setupCanvas() {
+            canvas = document.getElementById('handwritingCanvas');
+            ctx = canvas.getContext('2d');
+            
+            canvas.width = canvas.parentElement.clientWidth - 50;
+            canvas.height = Math.min(window.innerHeight * 0.6, 500);
+
+            ctx.fillStyle = canvasBackgroundColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.lineWidth = penSize;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = penColor;
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            canvas.addEventListener('touchstart', startDrawingTouch, { passive: false });
+            canvas.addEventListener('touchmove', drawTouch, { passive: false });
+            canvas.addEventListener('touchend', stopDrawing);
+
+            document.getElementById('penColor').addEventListener('change', (e) => {
+                penColor = e.target.value;
+                if (currentTool === 'pen') {
+                    ctx.strokeStyle = penColor;
+                }
+            });
+            document.getElementById('penSize').addEventListener('input', (e) => {
+                penSize = parseInt(e.target.value);
+                document.getElementById('penSizeValue').textContent = penSize;
+                ctx.lineWidth = penSize;
+            });
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+
+        function startDrawingTouch(e) {
+            e.preventDefault(); 
+            isDrawing = true;
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            lastX = touch.clientX - rect.left;
+            lastY = touch.clientY - rect.top;
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+        }
+
+        function drawTouch(e) {
+            e.preventDefault(); 
+            if (!isDrawing) return;
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const currentX = touch.clientX - rect.left;
+            const currentY = touch.clientY - rect.top;
+            ctx.lineTo(currentX, currentY);
+            ctx.stroke();
+            lastX = currentX;
+            lastY = currentY;
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function clearCanvas() {
+            ctx.fillStyle = canvasBackgroundColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function setTool(tool) {
+            currentTool = tool;
+            if (currentTool === 'pen') {
+                ctx.strokeStyle = penColor;
+            } else if (currentTool === 'eraser') {
+                ctx.strokeStyle = canvasBackgroundColor; 
+            }
+        }
+
+        function exportCanvas(format) {
+            const dataURL = canvas.toDataURL(`image/${format}`);
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = `handwriting.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            displayMessage(`Handwriting exported as ${format.toUpperCase()}!`);
+        }
+
+        // --- Audio Notes Functions ---
+        async function startRecording() {
+            try {
+                if (audioStream) return;
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(audioStream);
+                mediaRecorder.ondataavailable = e => {
+                    audioChunks.push(e.data);
+                };
+                mediaRecorder.onstop = () => {
+                    saveRecording();
+                    audioStream.getTracks().forEach(track => track.stop());
+                    audioStream = null;
+                };
+                mediaRecorder.start();
+                document.getElementById('recordBtn').disabled = true;
+                document.getElementById('stopBtn').disabled = false;
+                document.getElementById('pauseBtn').disabled = false;
+                document.getElementById('recordBtn').textContent = (currentLanguage === 'es' ? '🔴 Grabando...' : '🔴 Recording...');
+                document.getElementById('pauseBtn').textContent = (currentLanguage === 'es' ? '⏸️ Pausar' : '⏸️ Pause');
+            } catch (e) {
+                console.error('Error recording audio: ', e);
+                displayMessage('Could not access microphone. Please ensure permissions are granted.', 'error');
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                document.getElementById('recordBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                document.getElementById('pauseBtn').disabled = true;
+                document.getElementById('pauseBtn').textContent = (currentLanguage === 'es' ? '▶️ Reanudar' : '▶️ Resume');
+                document.getElementById('recordBtn').textContent = (currentLanguage === 'es' ? '🔴 Grabar' : '🔴 Record');
+            }
+        }
+
+        function pauseRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.pause();
+                document.getElementById('pauseBtn').textContent = (currentLanguage === 'es' ? '▶️ Reanudar' : '▶️ Resume');
+            } else if (mediaRecorder && mediaRecorder.state === 'paused') {
+                mediaRecorder.resume();
+                document.getElementById('pauseBtn').textContent = (currentLanguage === 'es' ? '⏸️ Pausar' : '⏸️ Pause');
+            }
+        }
+
+        function saveRecording() {
+            const blob = new Blob(audioChunks, { type: 'audio/wav' });
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                const description = document.getElementById('audioDescription').value;
+                const audioData = {
+                    src: reader.result,
+                    description: description,
+                    timestamp: new Date().toLocaleString()
+                };
+                audioList.push(audioData);
+                localStorage.setItem('audioList', JSON.stringify(audioList));
+                audioChunks = [];
+                document.getElementById('audioDescription').value = '';
+                updateAudioList();
+            };
+            reader.readAsDataURL(blob);
+        }
+        
+        function updateAudioList() {
+            const list = document.getElementById('audioList');
+            list.innerHTML = '';
+            audioList.forEach((audio, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.innerHTML = `
+                    <div>
+                        <strong>${audio.timestamp}</strong> - ${audio.description.substring(0, 30)}...
+                    </div>
+                    <div>
+                        <button onclick="playAudio(${index})" data-english="▶️ Play" data-spanish="▶️ Reproducir">▶️ Play</button>
+                        <button onclick="deleteAudio(${index})" data-english="🗑️ Delete" data-spanish="🗑️ Borrar">🗑️ Delete</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+            changeLanguage(currentLanguage); // Re-apply language to new elements
+        }
+
+        function playAudio(index) {
+            const audio = new Audio(audioList[index].src);
+            audio.play();
+        }
+
+        function deleteAudio(index) {
+            showConfirm("Are you sure you want to delete this audio?", () => {
+                audioList.splice(index, 1);
+                localStorage.setItem('audioList', JSON.stringify(audioList));
+                updateAudioList();
+                displayMessage('Audio note deleted!');
+            });
+        }
+
+        // --- Event Scheduler Functions ---
+        function setEventReminder() {
+            const eventTime = new Date(document.getElementById('eventDateTime').value).getTime();
+            const description = document.getElementById('eventDescription').value;
+            const enableTts = document.getElementById('eventTts').checked;
+            const reminderOffset = parseInt(document.getElementById('eventReminderOffset').value);
+
+            if (isNaN(eventTime)) {
+                displayMessage("Please select a valid date and time.", 'error');
+                return;
+            }
+
+            const reminderTime = eventTime - (reminderOffset * 60 * 1000);
+            const now = new Date().getTime();
+            const timeDiff = reminderTime - now;
+
+            if (timeDiff <= 0) {
+                displayMessage("Please select a future date and time.", 'error');
+                return;
+            }
+
+            const event = {
+                id: Date.now(),
+                description: description,
+                dateTime: document.getElementById('eventDateTime').value,
+                guests: document.getElementById('eventGuests').value,
+                location: document.getElementById('eventLocation').value,
+                enableTts: enableTts
+            };
+
+            events.push(event);
+            localStorage.setItem('events', JSON.stringify(events));
+            updateEventList();
+            displayMessage("Event reminder set successfully!");
+
+            setTimeout(() => {
+                if (event.enableTts) {
+                    const message = (currentLanguage === 'es' ? 
+                        `Recordatorio de Evento: ${event.description}. Invitados: ${event.guests}. Ubicación: ${event.location}.` :
+                        `Event Reminder: ${event.description}. Guests: ${event.guests}. Location: ${event.location}.`);
+                    const utterance = new SpeechSynthesisUtterance(message);
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
+                    audio.play();
+                }
+                displayMessage(`Event Reminder: ${event.description}`);
+            }, timeDiff);
+        }
+        
+        function updateEventList() {
+            const list = document.querySelector('#eventList ul');
+            list.innerHTML = '';
+            events.forEach((event, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.innerHTML = `
+                    <div>
+                        <strong>${new Date(event.dateTime).toLocaleString()}</strong> - ${event.description}
+                    </div>
+                    <button onclick="deleteEvent(${index})">🗑️</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+        
+        function deleteEvent(index) {
+            showConfirm("Are you sure you want to delete this event?", () => {
+                events.splice(index, 1);
+                localStorage.setItem('events', JSON.stringify(events));
+                updateEventList();
+                displayMessage('Event deleted!');
+            });
+        }
+
+        // --- Task Manager Functions ---
+        function saveTask() {
+            const subject = document.getElementById('taskSubject').value;
+            const description = document.getElementById('taskDescription').value;
+            const dateTime = document.getElementById('taskDateTime').value;
+            const urgency = document.getElementById('taskUrgency').value;
+            const enableTts = document.getElementById('taskTts').checked;
+            const reminderOffset = parseInt(document.getElementById('taskReminderOffset').value);
+
+            if (!subject || !dateTime) {
+                displayMessage("Please fill in task subject and date/time.", 'error');
+                return;
+            }
+
+            const task = {
+                id: Date.now(),
+                subject: subject,
+                description: description,
+                dateTime: dateTime,
+                urgency: urgency,
+                enableTts: enableTts
+            };
+
+            tasks.push(task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            updateTaskList();
+            displayMessage("Task saved successfully!");
+
+            const taskTime = new Date(dateTime).getTime();
+            const now = new Date().getTime();
+            const reminderTime = taskTime - (reminderOffset * 60 * 1000);
+            const timeDiff = reminderTime - now;
+
+            if (timeDiff > 0) {
+                setTimeout(() => {
+                    if (task.enableTts) {
+                        const message = (currentLanguage === 'es' ?
+                            `Recordatorio de Tarea: ${task.subject} - ${task.description}` :
+                            `Task Reminder: ${task.subject} - ${task.description}`);
+                        const utterance = new SpeechSynthesisUtterance(message);
+                        window.speechSynthesis.speak(utterance);
+                    } else {
+                         const audio = new Audio('https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg');
+                         audio.play();
+                    }
+                    displayMessage(`Task Reminder: ${task.subject}`);
+                }, timeDiff);
+            }
+        }
+
+        function updateTaskList() {
+            const list = document.getElementById('taskList');
+            list.innerHTML = '';
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                const urgencyText = {
+                    'low': (currentLanguage === 'es' ? 'Baja' : 'Low'),
+                    'medium': (currentLanguage === 'es' ? 'Media' : 'Medium'),
+                    'high': (currentLanguage === 'es' ? 'Alta' : 'High')
+                }[task.urgency];
+                li.innerHTML = `
+                    <div>
+                        <strong>${task.subject}</strong> (${(currentLanguage === 'es' ? 'Urgencia' : 'Urgency')}: ${urgencyText})
+                        <p>${new Date(task.dateTime).toLocaleString()}</p>
+                        <p>${task.description}</p>
+                    </div>
+                    <button onclick="deleteTask(${index})">🗑️</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+        
+        function deleteTask(index) {
+            showConfirm("Are you sure you want to delete this task?", () => {
+                tasks.splice(index, 1);
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+                updateTaskList();
+                displayMessage('Task deleted!');
+            });
+        }
+
+        // --- Appointment Schedule Functions ---
+        function saveAppointment() {
+            const clientName = document.getElementById('clientName').value;
+            const dateTime = document.getElementById('appointmentDateTime').value;
+            const notes = document.getElementById('appointmentNotes').value;
+
+            if (clientName && dateTime) {
+                const appointment = {
+                    client: clientName,
+                    dateTime: dateTime,
+                    notes: notes,
+                };
+                appointments.push(appointment);
+                localStorage.setItem('appointments', JSON.stringify(appointments));
+                updateAppointmentList();
+                displayMessage("Appointment saved!");
+            } else {
+                displayMessage("Please fill in client name and date/time.", 'error');
+            }
+        }
+
+        function updateAppointmentList() {
+            const list = document.getElementById('appointmentList');
+            list.innerHTML = '';
+            appointments.forEach((app, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.innerHTML = `
+                    <div>
+                        <strong>${(currentLanguage === 'es' ? 'Cliente' : 'Client')}: ${app.client}</strong>
+                        <p>${(currentLanguage === 'es' ? 'Fecha' : 'Date')}: ${new Date(app.dateTime).toLocaleString()}</p>
+                        <p>${(currentLanguage === 'es' ? 'Notas' : 'Notes')}: ${app.notes}</p>
+                    </div>
+                    <button onclick="deleteAppointment(${index})">🗑️</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+        
+        function deleteAppointment(index) {
+            showConfirm("Are you sure you want to delete this appointment?", () => {
+                appointments.splice(index, 1);
+                localStorage.setItem('appointments', JSON.stringify(appointments));
+                updateAppointmentList();
+                displayMessage('Appointment deleted!');
+            });
+        }
+
+        // --- Global Search Functions ---
+        function performGlobalSearch() {
+            const searchTerm = document.getElementById('globalSearchTerm').value.toLowerCase();
+            const resultsList = document.getElementById('searchResults');
+            resultsList.innerHTML = '';
+            if (!searchTerm) {
+                return;
+            }
+            
+            let foundResults = false;
+
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('save_')) {
+                    const content = localStorage.getItem(key).toLowerCase();
+                    if (content.includes(searchTerm)) {
+                        const li = document.createElement('li');
+                        li.textContent = `${(currentLanguage === 'es' ? 'Encontrado en Notas de Texto' : 'Found in Text notes')}: "${content.substring(0, 50)}..."`;
+                        resultsList.appendChild(li);
+                        foundResults = true;
+                    }
+                }
+            }
+
+            audioList.forEach(audio => {
+                if (audio.description.toLowerCase().includes(searchTerm)) {
+                    const li = document.createElement('li');
+                    li.textContent = `${(currentLanguage === 'es' ? 'Encontrado en Descripción de Audio' : 'Found in Audio description')}: "${audio.description}"`;
+                    resultsList.appendChild(li);
+                    foundResults = true;
+                }
+            });
+
+            tasks.forEach(task => {
+                if (task.subject.toLowerCase().includes(searchTerm) || task.description.toLowerCase().includes(searchTerm)) {
+                    const li = document.createElement('li');
+                    li.textContent = `${(currentLanguage === 'es' ? 'Encontrado en Tarea' : 'Found in Task')}: "${task.subject}"`;
+                    resultsList.appendChild(li);
+                    foundResults = true;
+                }
+            });
+
+            events.forEach(event => {
+                if (event.description.toLowerCase().includes(searchTerm) || event.guests.toLowerCase().includes(searchTerm) || event.location.toLowerCase().includes(searchTerm)) {
+                    const li = document.createElement('li');
+                    li.textContent = `${(currentLanguage === 'es' ? 'Encontrado en Evento' : 'Found in Event')}: "${event.description}"`;
+                    resultsList.appendChild(li);
+                    foundResults = true;
+                }
+            });
+            
+            appointments.forEach(app => {
+                if (app.client.toLowerCase().includes(searchTerm) || app.notes.toLowerCase().includes(searchTerm)) {
+                    const li = document.createElement('li');
+                    li.textContent = `${(currentLanguage === 'es' ? 'Encontrado en Cita' : 'Found in Appointment')}: "${app.client}"`;
+                    resultsList.appendChild(li);
+                    foundResults = true;
+                }
+            });
+
+            if (!foundResults) {
+                const li = document.createElement('li');
+                li.textContent = `${(currentLanguage === 'es' ? 'No se encontraron resultados para' : 'No results found for')} "${searchTerm}".`;
+                resultsList.appendChild(li);
+            }
+        }
+
+        // --- Diary Tab Functions ---
+        function loadProfileForEditing() {
+            document.getElementById('user-name-secure').value = profile.name || '';
+            document.getElementById('profileSex-secure').value = profile.sex || 'male';
+            document.getElementById('profileDob-secure').value = profile.dob || '';
+            document.getElementById('profileCountry-secure').value = profile.country || '';
+            document.getElementById('profilePhone-secure').value = profile.phone || '';
+
+            document.getElementById('notepadPinSecure').value = '';
+            document.getElementById('notepadPinConfirmSecure').value = '';
+            document.getElementById('diaryPasswordSecure').value = '';
+            document.getElementById('diaryPasswordConfirmSecure').value = '';
+            document.getElementById('security-question-secure').value = securityQuestion || '';
+            document.getElementById('security-answer-secure').value = '';
+
+            document.getElementById('language-selector').value = currentLanguage;
+        }
+
+        function updateProfileDisplay() {
+            if (profile.pic) {
+                document.getElementById('diary-profile-pic').src = profile.pic;
+                document.getElementById('diary-profile-pic').classList.remove('hidden');
+            } else {
+                document.getElementById('diary-profile-pic').classList.add('hidden');
+            }
+            
+            const greetingEl = document.getElementById('diaryGreeting');
+            if (!profile.name) {
+                greetingEl.textContent = (currentLanguage === 'es' ? '¡Bienvenido a tu Diario!' : 'Welcome to your Diary!');
+                return;
+            }
+            
+            let title = '';
+            const age = calculateAge(profile.dob);
+
+            if (profile.sex === 'male') {
+                title = age >= 18 ? (currentLanguage === 'es' ? 'Señor' : 'Sir') : (currentLanguage === 'es' ? 'Sr.' : 'Mr.');
+            } else if (profile.sex === 'female') {
+                title = age >= 30 ? (currentLanguage === 'es' ? 'Señora' : 'Madam') : (currentLanguage === 'es' ? 'Srta.' : 'Ms.');
+            }
+
+            greetingEl.textContent = `${(currentLanguage === 'es' ? 'Bienvenido/a' : 'Welcome')} ${title} ${profile.name}!`;
+        }
+        
+        function calculateAge(dob) {
+            const today = new Date();
+            const birthDate = new Date(dob);
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        function saveMorningPages() {
+            const date = document.getElementById('morningPagesDate').value;
+            const text = document.getElementById('morningPagesText').value;
+            if (date && text) {
+                morningPages.push({ date, text });
+                localStorage.setItem('morningPages', JSON.stringify(morningPages));
+                updateMorningPagesList();
+                document.getElementById('morningPagesText').value = '';
+                displayMessage("Morning pages entry saved!");
+            } else {
+                displayMessage("Please select a date and write some text.", 'error');
+            }
+        }
+        
+        function updateMorningPagesList() {
+            const list = document.getElementById('morningPagesList');
+            list.innerHTML = '';
+            morningPages.forEach((entry, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.innerHTML = `
+                    <div>
+                        <strong>${entry.date}</strong> - ${entry.text.substring(0, 50)}...
+                    </div>
+                    <button onclick="deleteMorningPages(${index})">🗑️</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+        
+        function deleteMorningPages(index) {
+            showConfirm("Are you sure you want to delete this morning pages entry?", () => {
+                morningPages.splice(index, 1);
+                localStorage.setItem('morningPages', JSON.stringify(morningPages));
+                updateMorningPagesList();
+                displayMessage('Morning pages entry deleted!');
+            });
+        }
+
+        function addGoal() {
+            const goalText = document.getElementById('goalInput').value;
+            if (goalText) {
+                goals.push({ text: goalText, accomplished: false });
+                localStorage.setItem('goals', JSON.stringify(goals));
+                updateGoalsList();
+                document.getElementById('goalInput').value = '';
+            } else {
+                displayMessage("Please enter a goal.", 'error');
+            }
+        }
+        
+        function updateGoalsList() {
+            const list = document.getElementById('goalsList');
+            list.innerHTML = '';
+            goals.forEach((goal, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.style.textDecoration = goal.accomplished ? 'line-through' : 'none';
+                li.style.color = goal.accomplished ? 'green' : 'black';
+                li.innerHTML = `
+                    <span>${goal.text}</span>
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" ${goal.accomplished ? 'checked' : ''} onchange="toggleGoal(${index})">
+                        <button onclick="deleteGoal(${index})">🗑️</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+        
+        function toggleGoal(index) {
+            goals[index].accomplished = !goals[index].accomplished;
+            localStorage.setItem('goals', JSON.stringify(goals));
+            updateGoalsList();
+            if (goals[index].accomplished) {
+                displayMessage("Congratulations! You accomplished a goal!");
+            }
+        }
+        
+        function deleteGoal(index) {
+            showConfirm("Are you sure you want to delete this goal?", () => {
+                goals.splice(index, 1);
+                localStorage.setItem('goals', JSON.stringify(goals));
+                updateGoalsList();
+                displayMessage('Goal deleted!');
+            });
+        }
+
+        function saveDiaryEntry() {
+            const date = document.getElementById('diaryDateSelector').value;
+            const text = document.getElementById('diaryNotes').value;
+            const files = document.getElementById('fileImport').files;
+
+            if (!date) {
+                displayMessage("Please select a date.", 'error');
+                return;
+            }
+
+            const entry = {
+                text: text,
+                files: []
+            };
+
+            const filePromises = Array.from(files).map(file => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        resolve({
+                            name: file.name,
+                            type: file.type,
+                            data: e.target.result
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            Promise.all(filePromises).then(fileData => {
+                entry.files = fileData;
+                diaryEntries[date] = entry;
+                localStorage.setItem('diaryEntries', JSON.stringify(diaryEntries));
+                displayMessage("Diary entry saved!");
+                updateAttachedFilesList(date);
+            });
+        }
+
+        function updateAttachedFilesList(date) {
+            const list = document.getElementById('attachedFilesList');
+            list.innerHTML = '';
+            const entry = diaryEntries[date];
+            if (entry && entry.files) {
+                entry.files.forEach((file, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${file.name}</span>
+                        <div>
+                            <button onclick="viewFile('${date}', ${index})">👁️</button>
+                            <button onclick="deleteFile('${date}', ${index})">🗑️</button>
+                        </div>
+                    `;
+                    list.appendChild(li);
+                });
+            }
+        }
+
+        function viewFile(date, index) {
+            const file = diaryEntries[date].files[index];
+            const a = document.createElement('a');
+            a.href = file.data;
+            a.download = file.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function deleteFile(date, index) {
+            showConfirm("Are you sure you want to delete this file?", () => {
+                diaryEntries[date].files.splice(index, 1);
+                localStorage.setItem('diaryEntries', JSON.stringify(diaryEntries));
+                updateAttachedFilesList(date);
+                displayMessage('File deleted!');
+            });
+        }
+
+        document.getElementById('diaryDateSelector').addEventListener('change', (e) => {
+            const date = e.target.value;
+            const entry = diaryEntries[date];
+            document.getElementById('diaryNotes').value = entry ? entry.text : '';
+            updateAttachedFilesList(date);
+        });
+
+        // --- Language Translation Function (Now for entire app) ---
+        function changeLanguage(lang = document.getElementById('language-selector').value) {
+            currentLanguage = lang;
+            localStorage.setItem('appLanguage', currentLanguage);
+            document.getElementById('language-selector').value = currentLanguage; 
+
+            document.querySelectorAll('[data-english]').forEach(element => {
+                if (currentLanguage === 'es') {
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = element.getAttribute('data-spanish-placeholder') || element.getAttribute('data-english-placeholder');
+                    } else {
+                        element.textContent = element.getAttribute('data-spanish');
+                    }
+                } else {
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = element.getAttribute('data-english-placeholder');
+                    } else {
+                        element.textContent = element.getAttribute('data-english');
+                    }
+                }
+            });
+
+            // Update specific messages/dynamic content that isn't directly in data-attributes
+            if (currentTab === 'pin-screen') { // Assuming this is set when pin-screen is active
+                const pinTitle = document.getElementById('pin-title');
+                if (pinTitle.textContent.includes('Enter PIN to Access Notepad') || pinTitle.textContent.includes('Introduce PIN para Acceder al Bloc de Notas')) {
+                    pinTitle.textContent = (currentLanguage === 'es' ? 'Introduce PIN para Acceder al Bloc de Notas' : 'Enter PIN to Access Notepad');
+                } else if (pinTitle.textContent.includes('Enter PIN to View Login History') || pinTitle.textContent.includes('Introduce PIN para Ver Historial de Inicio de Sesión')) {
+                     pinTitle.textContent = (currentLanguage === 'es' ? 'Introduce PIN para Ver Historial de Inicio de Sesión' : 'Enter PIN to View Login History');
+                } else if (pinTitle.textContent.includes('Enter PIN to View Security Settings') || pinTitle.textContent.includes('Introduce PIN para Ver Configuración de Seguridad')) {
+                    pinTitle.textContent = (currentLanguage === 'es' ? 'Introduce PIN para Ver Configuración de Seguridad' : 'Enter PIN to View Security Settings');
+                } else {
+                    pinTitle.textContent = (currentLanguage === 'es' ? 'Establecer Nombre y PIN' : 'Set Name and PIN');
+                }
+            }
+
+            if (currentTab === 'diaryContent') { // Assuming this is set when diaryContent is active
+                updateProfileDisplay(); // To re-translate the greeting
+            }
+
+            // Update elements within lists that are not dynamically generated text
+            const audioPlayButtons = document.querySelectorAll('#audioList button[data-english="▶️ Play"]');
+            audioPlayButtons.forEach(btn => {
+                btn.textContent = (currentLanguage === 'es' ? '▶️ Reproducir' : '▶️ Play');
+            });
+
+            const audioDeleteButtons = document.querySelectorAll('#audioList button[data-english="🗑️ Delete"]');
+            audioDeleteButtons.forEach(btn => {
+                btn.textContent = (currentLanguage === 'es' ? '🗑️ Borrar' : '🗑️ Delete');
+            });
+
+            // Update specific dynamic messages/elements
+            document.getElementById('recordBtn').textContent = (currentLanguage === 'es' ? '🔴 Grabar' : '🔴 Record');
+            document.getElementById('pauseBtn').textContent = (currentLanguage === 'es' ? '⏸️ Pausar' : '⏸️ Pause');
+            document.getElementById('stopBtn').textContent = (currentLanguage === 'es' ? '⏹️ Detener' : '⏹️ Stop');
+
+
+            displayMessage(`Language set to ${lang === 'es' ? 'Spanish' : 'English'}!`);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('language-selector').value = currentLanguage;
+            changeLanguage(currentLanguage);
+            setupCanvas(); 
+        });
+
+    </script>
+</body>
+</html>
