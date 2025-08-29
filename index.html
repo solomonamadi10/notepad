@@ -356,6 +356,17 @@
             }
             .page {
                 padding: 15px;
+                display: flex; /* Add this line to make it a flexbox */
+                flex-direction: column; /* Add this line to stack children vertically */
+                height: 100%; /* Add this to make the page fill the available height */
+            }
+            .page .flex-grow {
+                flex-grow: 1; /* This makes the content area expand to fill space */
+                overflow-y: auto; /* This adds a vertical scrollbar when content overflows */
+                padding: 25px; /* Add this for padding */
+            }
+            #secureContent button {
+                margin-top: auto; /* Pushes the button to the bottom of the flex container */
             }
             .controls {
                 flex-direction: column;
@@ -374,6 +385,9 @@
             .diary-section {
                 height: auto;
                 min-height: 300px;
+            }
+            .page .flex-grow {
+                padding: 15px; /* Adjust padding for mobile screens */
             }
         }
     </style>
@@ -483,50 +497,49 @@
                 <div class="save-list" id="saveList"></div>
             </div>
             <div id="secureContent" class="tab-content">
-                <div class="page">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="Security Settings" data-spanish="Configuración de Seguridad">Security Settings</h2>
-
-                    <!-- Language Selection -->
-                    <h4 class="text-lg font-semibold mt-4 mb-2" data-english="Language Settings" data-spanish="Configuración de Idioma">Language Settings</h4>
-                    <select id="language-selector" class="w-full p-3 my-2 border rounded" onchange="changeLanguage()">
-                        <option value="en" data-english="English" data-spanish="Inglés">English</option>
-                        <option value="es" data-english="Español" data-spanish="Español">Español</option>
-                    </select>
-                    <!-- End Language Selection -->
-
-                    <div id="profile-container-secure">
-                        <h4 class="text-lg font-semibold mt-4 mb-2" data-english="My Profile" data-spanish="Mi Perfil">My Profile</h4>
-                        <input type="text" id="user-name-secure" data-english-placeholder="Enter your name" data-spanish-placeholder="Introduce tu nombre" placeholder="Enter your name" required class="p-2 border rounded">
-                        <label data-english="Sex:" data-spanish="Sexo:">Sex:</label>
-                        <select id="profileSex-secure" class="w-full p-2 border rounded">
-                            <option value="male" data-english="Male" data-spanish="Hombre">Male</option>
-                            <option value="female" data-english="Female" data-spanish="Mujer">Female</option>
-                            <option value="other" data-english="Other" data-spanish="Otro">Otro</option>
+                <div class="page flex flex-col h-full">
+                    <div class="flex-grow overflow-y-auto">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4" data-english="Security Settings" data-spanish="Configuración de Seguridad">Security Settings</h2>
+                        
+                        <h4 class="text-lg font-semibold mt-4 mb-2" data-english="Language Settings" data-spanish="Configuración de Idioma">Language Settings</h4>
+                        <select id="language-selector" class="w-full p-3 my-2 border rounded" onchange="changeLanguage()">
+                            <option value="en" data-english="English" data-spanish="Inglés">English</option>
+                            <option value="es" data-english="Español" data-spanish="Español">Español</option>
                         </select>
-                        <label data-english="Date of Birth:" data-spanish="Fecha de Nacimiento:">Date of Birth:</label>
-                        <input type="date" id="profileDob-secure" class="w-full p-2 border rounded">
-                        <label data-english="Country:" data-spanish="País:">Country:</label>
-                        <input type="text" id="profileCountry-secure" data-english-placeholder="Country" data-spanish-placeholder="País" placeholder="Country" class="w-full p-2 border rounded">
-                        <label data-english="Phone Number:" data-spanish="Número de Teléfono:">Phone Number:</label>
-                        <input type="tel" id="profilePhone-secure" data-english-placeholder="Phone Number" data-spanish-placeholder="Número de Teléfono" placeholder="Phone Number" class="w-full p-2 border rounded">
-                        <label data-english="Profile Picture:" data-spanish="Foto de Perfil:">Profile Picture:</label>
-                        <input type="file" id="profilePic-secure" accept="image/*" class="w-full p-2 border rounded">
-                        <button onclick="saveProfileOnly()" class="px-4 py-2 bg-green-500 text-white rounded mt-2 shadow-md hover:bg-green-600 transition duration-300" data-english="Save Profile" data-spanish="Guardar Perfil">Save Profile</button>
+                        <div id="profile-container-secure">
+                            <h4 class="text-lg font-semibold mt-4 mb-2" data-english="My Profile" data-spanish="Mi Perfil">My Profile</h4>
+                            <input type="text" id="user-name-secure" data-english-placeholder="Enter your name" data-spanish-placeholder="Introduce tu nombre" placeholder="Enter your name" required class="p-2 border rounded">
+                            <label data-english="Sex:" data-spanish="Sexo:">Sex:</label>
+                            <select id="profileSex-secure" class="w-full p-2 border rounded">
+                                <option value="male" data-english="Male" data-spanish="Hombre">Male</option>
+                                <option value="female" data-english="Female" data-spanish="Mujer">Female</option>
+                                <option value="other" data-english="Other" data-spanish="Otro">Otro</option>
+                            </select>
+                            <label data-english="Date of Birth:" data-spanish="Fecha de Nacimiento:">Date of Birth:</label>
+                            <input type="date" id="profileDob-secure" class="w-full p-2 border rounded">
+                            <label data-english="Country:" data-spanish="País:">Country:</label>
+                            <input type="text" id="profileCountry-secure" data-english-placeholder="Country" data-spanish-placeholder="País" placeholder="Country" class="w-2/3 p-2 border rounded">
+                            <label data-english="Phone Number:" data-spanish="Número de Teléfono:">Phone Number:</label>
+                            <input type="tel" id="profilePhone-secure" data-english-placeholder="Phone Number" data-spanish-placeholder="Número de Teléfono" placeholder="Phone Number" class="w-2/3 p-2 border rounded">
+                            <label data-english="Profile Picture:" data-spanish="Foto de Perfil:">Profile Picture:</label>
+                            <input type="file" id="profilePic-secure" accept="image/*" class="w-full p-2 border rounded">
+                            <button onclick="saveProfileOnly()" class="px-4 py-2 bg-green-500 text-white rounded mt-2 shadow-md hover:bg-green-600 transition duration-300" data-english="Save Profile" data-spanish="Guardar Perfil">Save Profile</button>
+                        </div>
+                        <h4 class="text-lg font-semibold mt-4 mb-2" data-english="Notepad Security" data-spanish="Seguridad del Bloc de Notas">Notepad Security</h4>
+                        <input type="text" id="notepadPinSecure" maxlength="4" data-english-placeholder="Enter 4-digit PIN (numbers only)" data-spanish-placeholder="Introduce PIN de 4 dígitos (solo números)" placeholder="Enter 4-digit PIN (numbers only)" pattern="\d{4}" required class="p-3 border-2 border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-300 transition duration-200 shadow-sm">
+                        <input type="text" id="notepadPinConfirmSecure" maxlength="4" data-english-placeholder="Confirm PIN" data-spanish-placeholder="Confirmar PIN" placeholder="Confirm PIN" pattern="\d{4}" required class="p-3 border-2 border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-300 transition duration-200 shadow-sm">
+                        <h4 class="text-lg font-semibold mt-4 mb-2" data-english="Diary Security" data-spanish="Seguridad del Diario">Diary Security</h4>
+                        <input type="password" id="diaryPasswordSecure" maxlength="8" data-english-placeholder="Enter Diary password (8 characters max)" data-spanish-placeholder="Introduce contraseña del Diario (8 caracteres máx.)" placeholder="Enter Diary password (8 characters max)" required class="p-3 border-2 border-purple-400 rounded-lg focus:ring-2 focus:ring-purple-300 transition duration-200 shadow-sm">
+                        <input type="password" id="diaryPasswordConfirmSecure" maxlength="8" data-english-placeholder="Confirm password" data-spanish-placeholder="Confirmar contraseña" placeholder="Confirm password" required class="p-3 border-2 border-purple-400 rounded-lg focus:ring-2 focus:ring-purple-300 transition duration-200 shadow-sm">
+                        <select id="security-question-secure" required class="w-full p-3 my-2 border rounded">
+                            <option value="" data-english="Select Security Question" data-spanish="Seleccionar Pregunta de Seguridad">Select Security Question</option>
+                            <option value="mother" data-english="What is your mother's maiden name?" data-spanish="¿Cuál es el apellido de soltera de tu madre?">What is your mother's maiden name?</option>
+                            <option value="school" data-english="Where was your first elementary school?" data-spanish="¿Dónde estuvo tu primera escuela primaria?">Where was your first elementary school?</option>
+                            <option value="friend" data-english="What is the name of your best friend?" data-spanish="¿Cuál es el nombre de tu mejor amigo(a)?">What is the name of your best friend?</option>
+                        </select>
+                        <input type="text" id="security-answer-secure" data-english-placeholder="Enter answer" data-spanish-placeholder="Introduce respuesta" placeholder="Enter answer" required class="p-2 border rounded">
                     </div>
-                    <h4 class="text-lg font-semibold mt-4 mb-2" data-english="Notepad Security" data-spanish="Seguridad del Bloc de Notas">Notepad Security</h4>
-                    <input type="text" id="notepadPinSecure" maxlength="4" data-english-placeholder="Enter 4-digit PIN (numbers only)" data-spanish-placeholder="Introduce PIN de 4 dígitos (solo números)" placeholder="Enter 4-digit PIN (numbers only)" pattern="\d{4}" required class="p-3 border-2 border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-300 transition duration-200 shadow-sm">
-                    <input type="text" id="notepadPinConfirmSecure" maxlength="4" data-english-placeholder="Confirm PIN" data-spanish-placeholder="Confirmar PIN" placeholder="Confirm PIN" pattern="\d{4}" required class="p-3 border-2 border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-300 transition duration-200 shadow-sm">
-                    <h4 class="text-lg font-semibold mt-4 mb-2" data-english="Diary Security" data-spanish="Seguridad del Diario">Diary Security</h4>
-                    <input type="password" id="diaryPasswordSecure" maxlength="8" data-english-placeholder="Enter Diary password (8 characters max)" data-spanish-placeholder="Introduce contraseña del Diario (8 caracteres máx.)" placeholder="Enter Diary password (8 characters max)" required class="p-3 border-2 border-purple-400 rounded-lg focus:ring-2 focus:ring-purple-300 transition duration-200 shadow-sm">
-                    <input type="password" id="diaryPasswordConfirmSecure" maxlength="8" data-english-placeholder="Confirm password" data-spanish-placeholder="Confirmar contraseña" placeholder="Confirm password" required class="p-3 border-2 border-purple-400 rounded-lg focus:ring-2 focus:ring-purple-300 transition duration-200 shadow-sm">
-                    <select id="security-question-secure" required class="w-full p-3 my-2 border rounded">
-                        <option value="" data-english="Select Security Question" data-spanish="Seleccionar Pregunta de Seguridad">Select Security Question</option>
-                        <option value="mother" data-english="What is your mother's maiden name?" data-spanish="¿Cuál es el apellido de soltera de tu madre?">What is your mother's maiden name?</option>
-                        <option value="school" data-english="Where was your first elementary school?" data-spanish="¿Dónde estuvo tu primera escuela primaria?">Where was your first elementary school?</option>
-                        <option value="friend" data-english="What is the name of your best friend?" data-spanish="¿Cuál es el nombre de tu mejor amigo(a)?">What is the name of your best friend?</option>
-                    </select>
-                    <input type="text" id="security-answer-secure" data-english-placeholder="Enter answer" data-spanish-placeholder="Introduce respuesta" placeholder="Enter answer" required class="p-2 border rounded">
-                    <button onclick="setPinsAndProfile()" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-300 text-lg font-semibold shadow-lg mt-4" data-english="Save Security Settings" data-spanish="Guardar Configuración de Seguridad">Save Security Settings</button>
+                    <button onclick="setPinsAndProfile()" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-300 text-lg font-semibold shadow-lg mt-4 mb-2" data-english="Save Security Settings" data-spanish="Guardar Configuración de Seguridad">Save Security Settings</button>
                     <p id="secure-message" class="text-red-500 mt-2"></p>
                 </div>
             </div>
